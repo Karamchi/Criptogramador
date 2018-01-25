@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Criptogramador</string>
     <string name="alphabet">abcdefghijklmnñopqrstuvwxyz</string>
-    <string name="alphabet_space">abcdefghijklmnñopqrstuvwxyz .,</string>
+    <string name="alphabet_space">abcdefghijklmnñopqrstuvwxyz .,\'</string>
 </resources>

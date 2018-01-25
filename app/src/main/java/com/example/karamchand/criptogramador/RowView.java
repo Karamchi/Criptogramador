@@ -3,7 +3,6 @@ package com.example.karamchand.criptogramador;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -35,11 +34,22 @@ public class RowView extends LinearLayout {
     public void update() {
         ((TextView) findViewById(R.id.amount)).setText(Integer.toString(mAmount));
         ((TextView) findViewById(R.id.total)).setText(Integer.toString(mTotal));
-        ((TextView) findViewById(R.id.percentage)).setText(
-                String.format("%d%%",
-                (int) ((mAmount / ((float) mTotal)) * 100)));
+        int percentage = (int) ((mAmount / ((float) mTotal)) * 100);
+        if (mAmount + mTotal == 0) percentage = 100;
+        int color = rgb(255 - 255 * (percentage - 90)/10, 255, 0);
+        if (percentage > 100) color = rgb(255, 0, 0);
+        if (percentage < 90) color = rgb(255, 255, 0);
+
+        TextView percentageView = findViewById(R.id.percentage);
+
+        percentageView.setText(String.format("%d%%", percentage));
+        percentageView.setBackgroundColor(color);
         ((TextView) findViewById(R.id.remaining)).setText(Integer.toString(mTotal - mAmount));
 
+    }
+
+    private int rgb(int r, int g, int b) {
+        return (200 & 0xff) << 24 | (r & 0xff) << 16 | (g & 0xff) << 8 | (b & 0xff);
     }
 
     public RowView withLetter(char c) {

@@ -7,7 +7,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,7 +49,9 @@ class WordView extends LinearLayout {
         findViewById(R.id.close).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mEditText.getText().length() < 1) return;
                 setText(Character.toString(mEditText.getText().charAt(0)));
+                mEditText.setSelection(1);
             }
         });
         mEditText.setOnFocusChangeListener(new OnFocusChangeListener() {

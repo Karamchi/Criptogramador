@@ -8,19 +8,28 @@
         android:id="@+id/phrase"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:digits="@string/alphabet_space"
         android:hint="Phrase"/>
 
     <EditText
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:digits="@string/alphabet_space"
         android:hint="Title and author"/>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/button_restart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="OK"/>
+        android:text="Restart"/>
+
+    <Button
+        android:id="@+id/button_resume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Resume"/>
 
 </LinearLayout>

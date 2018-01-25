@@ -1,7 +1,6 @@
 package com.example.karamchand.criptogramador;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -26,27 +25,25 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
         setContentView(R.layout.activity_main);
         sp = getSharedPreferences("private-shared-prefs", Activity.MODE_PRIVATE);
         mWordsView = ((WordsView) findViewById(R.id.words_view));
         mWordsView.setOnWordChangedListener(this);
         mLettersView = (LettersView) findViewById(R.id.letters_view);
-//        mLettersView.updatePhrase(new Data()"There he rose up out of the water");
-        setTitleAuthor("unfinished tales");
 
         mPhrase = (EditText) findViewById(R.id.phrase);
         mPhrase.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
             public void afterTextChanged(Editable editable) {
                 mLettersView.updatePhrase(new Data(editable.toString()));
+                sp.edit().putString("phrase", editable.toString()).apply();
             }
         });
 
@@ -60,22 +57,39 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
                 }
             }
         });
+
+        //Si el intent viene con author, lo seteamos y tiramos todo
+        //Si no, restoreamos sharedpreferences
+        if (getIntent().hasExtra("title"))
+            setTitleAuthor(getIntent().getStringExtra("title"));
+        if (getIntent().hasExtra("phrase"))
+            setPhrase(getIntent().getStringExtra("phrase"));
     }
 
     private void setTitleAuthor(String s) {
-        s = s.toLowerCase().replace(" ", "");
+        sp.edit().clear().apply();
+        s = s.toLowerCase().replaceAll("[^a-z]", "");
         for (int i = 0; i< s.length(); i++)
             mState.add("");
         mWordsView.setTitleAuthor(s);
         mLettersView.setTotalWords(s.length());
     }
 
+    private void setPhrase(String s) {
+        mPhrase.setText(s);
+        mPhrase.setSelection(s.length());
+    }
+
     @Override
     public void onWordChanged(int index, String newWord) {
-//        mState.ensureCapacity(index + 1);
         mState.set(index, newWord);
         mLettersView.update(new Data(mState));
         sp.edit().putString(Integer.toString(index), newWord).apply();
+    }
+
+    public void onWordAdded(){
+        mState.add("");
+        mLettersView.update(new Data(mState));
     }
 
     public class Data {
@@ -139,11 +153,12 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
+    protected void onResume() {
+        super.onResume();
         for (int i = 0; true; i++) {
             if (!sp.contains(Integer.toString(i))) break;
-//            else mWordsView.setWord(i, sp.getString(Integer.toString(i)));
+            else mWordsView.setWord(i, sp.getString(Integer.toString(i), ""));
         }
+        setPhrase(sp.getString("phrase", ""));
     }
 }

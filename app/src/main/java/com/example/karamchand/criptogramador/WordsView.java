@@ -1,25 +1,18 @@
 package com.example.karamchand.criptogramador;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
-import android.text.method.DigitsKeyListener;
 import android.util.AttributeSet;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
-import static com.example.karamchand.criptogramador.LettersView.ALPHABET;
-
 public class WordsView extends LinearLayout {
 
     private OnWordChangedListener w;
+    private ArrayList<WordView> mChildren = new ArrayList<>();
 
     public WordsView(Context context) {
         super(context);
@@ -45,11 +38,12 @@ public class WordsView extends LinearLayout {
     }
 
     public void setTitleAuthor(String titleAuthor) {
-        titleAuthor = titleAuthor.toLowerCase().replace(" ", "");
+        titleAuthor = titleAuthor.toLowerCase().replaceAll("[^a-z]", "");
         for (int i = 0; i < titleAuthor.length(); i++) {
             WordView newView = new WordView(getContext());
             newView.addTextChangedListener(getTextWatcher(i));
             newView.setText(Character.toString(titleAuthor.charAt(i)));
+            mChildren.add(newView);
             addView(newView);
         }
     }
@@ -71,8 +65,24 @@ public class WordsView extends LinearLayout {
         };
     }
 
+    public void setWord(int i, String string) {
+        try {
+            mChildren.get(i).setText(string);
+        } catch (IndexOutOfBoundsException e) {
+            if ((i < 0) || (i > 30)) return;
+            WordView newView = new WordView(getContext());
+            newView.addTextChangedListener(getTextWatcher(i));
+            mChildren.add(newView);
+            addView(newView);
+            w.onWordAdded();
+            setWord(i, string);
+        }
+    }
+
     public interface OnWordChangedListener {
         void onWordChanged(int index, String newWord);
+
+        void onWordAdded();
     }
 
 }
