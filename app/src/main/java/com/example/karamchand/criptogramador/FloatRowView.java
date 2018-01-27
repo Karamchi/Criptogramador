@@ -20,28 +20,9 @@ class FloatRowView extends RowView {
         ((TextView) findViewById(R.id.remaining)).setText(String.format("%.2f", remaining));
     }
 
-    public void increaseDivisor() {
-        mDivisor++;
-        update();
-    }
-
-    public void decreaseDivisor() {
-        mDivisor--;
-        update();
-    }
-
-    public void addTotalDivisor() {
-        mTotalDivisor++;
-        update();
-    }
-
-    public void resetTotalDivisor() {
-        mTotalDivisor = 0;
-        update();
-    }
-
     public void setTotalDivisor(int mTotalWords) {
         mTotalDivisor = mTotalWords;
+        update();
     }
 
     public void setDivisor(int count) {

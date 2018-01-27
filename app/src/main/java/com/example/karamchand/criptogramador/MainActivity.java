@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     private void setPhrase(String s) {
         mPhrase.setText(s);
         mPhrase.setSelection(s.length());
+        mLettersView.updatePhrase(new Data(s));
     }
 
     @Override
@@ -159,10 +160,12 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     @Override
     protected void onResume() {
         super.onResume();
-        for (int i = 0; true; i++) {
+        int i;
+        for (i = 0; true; i++) {
             if (!sp.contains(Integer.toString(i))) break;
             else mWordsView.setWord(i, sp.getString(Integer.toString(i), ""));
         }
         setPhrase(sp.getString("phrase", ""));
+        mLettersView.setTotalWords(i);
     }
 }
