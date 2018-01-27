@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 public class LettersView extends LinearLayout {
 
-    public static final String ALPHABET = "abcdefghijklmnñopqrstuwxyz";
+    public static final String ALPHABET = "abcdefghijklmnñopqrstuvwxyz";
     public static final String VOCALES = "aeiou";
     private HashMap<Character, RowView> mChildren = new HashMap<>();
     private RowView mTotals;

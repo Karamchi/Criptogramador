@@ -14,6 +14,8 @@ import android.widget.EditText;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static com.example.karamchand.criptogramador.LettersView.VOCALES;
+
 public class MainActivity extends AppCompatActivity implements WordsView.OnWordChangedListener {
 
     private LettersView mLettersView;
@@ -68,7 +70,8 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
 
     private void setTitleAuthor(String s) {
         sp.edit().clear().apply();
-        s = s.toLowerCase().replaceAll("[^a-z]", "");
+        s = PhraseActivity.toAlpha(s);
+
         for (int i = 0; i< s.length(); i++)
             mState.add("");
         mWordsView.setTitleAuthor(s);
@@ -116,12 +119,13 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         }
 
         private void processString(String s) {
+            s = PhraseActivity.toAlpha(s);
             for (char c : s.toCharArray()) {
                 if (counter.keySet().contains(c))
                     counter.put(c, counter.get(c) + 1);
                 else
                     counter.put(c, 1);
-                if (LettersView.VOCALES.contains(Character.toString(c)))
+                if (VOCALES.contains(Character.toString(c)))
                     vocales++;
                 sum++;
             }

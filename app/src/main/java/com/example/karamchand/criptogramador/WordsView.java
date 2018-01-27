@@ -38,7 +38,6 @@ public class WordsView extends LinearLayout {
     }
 
     public void setTitleAuthor(String titleAuthor) {
-        titleAuthor = titleAuthor.toLowerCase().replaceAll("[^a-z]", "");
         for (int i = 0; i < titleAuthor.length(); i++) {
             WordView newView = new WordView(getContext());
             newView.addTextChangedListener(getTextWatcher(i));

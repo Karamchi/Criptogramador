@@ -2,21 +2,51 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="4dp">
 
     <EditText
         android:id="@+id/phrase"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:digits="@string/alphabet_space"
-        android:hint="Phrase"/>
+        android:hint="Phrase"
+        android:maxLength="300"/>
 
     <EditText
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:digits="@string/alphabet_space"
-        android:hint="Title and author"/>
+        android:hint="Title and author"
+        android:maxLength="40"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/phrase_length"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/title_length"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/proportion"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center"/>
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/button_restart"

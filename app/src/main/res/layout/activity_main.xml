@@ -16,7 +16,6 @@
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
             android:textColor="#bebebe"
-            android:digits="@string/alphabet_space"
             android:background="@android:color/transparent"
             android:maxLength="300"/>
 
