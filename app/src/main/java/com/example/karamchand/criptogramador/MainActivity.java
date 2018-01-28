@@ -1,6 +1,7 @@
 package com.example.karamchand.criptogramador;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -27,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
         setContentView(R.layout.activity_main);
         sp = getSharedPreferences("private-shared-prefs", Activity.MODE_PRIVATE);
         mWordsView = ((WordsView) findViewById(R.id.words_view));
@@ -66,6 +66,13 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
             setTitleAuthor(getIntent().getStringExtra("title"));
         if (getIntent().hasExtra("phrase"))
             setPhrase(getIntent().getStringExtra("phrase"));
+
+        findViewById(R.id.go_to_search).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, SearchActivity.class));
+            }
+        });
     }
 
     private void setTitleAuthor(String s) {
@@ -81,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     private void setPhrase(String s) {
         mPhrase.setText(s);
         mPhrase.setSelection(s.length());
-        mLettersView.updatePhrase(new Data(s));
+//        mLettersView.updatePhrase(new Data(s));
     }
 
     @Override
@@ -93,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
 
     public void onWordAdded(){
         mState.add("");
-        mLettersView.update(new Data(mState));
     }
 
     public class Data {
@@ -160,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     @Override
     protected void onResume() {
         super.onResume();
+        if (!mState.isEmpty()) return;
         int i;
         for (i = 0; true; i++) {
             if (!sp.contains(Integer.toString(i))) break;

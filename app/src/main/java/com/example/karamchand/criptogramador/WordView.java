@@ -8,12 +8,16 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 class WordView extends LinearLayout {
 
     private EditText mEditText;
+    private String mOldText;
+    private ImageView mClose;
+    public boolean mShowBack;
 
     public WordView(Context context) {
         super(context);
@@ -44,14 +48,24 @@ class WordView extends LinearLayout {
             @Override
             public void afterTextChanged(Editable editable) {
                 ((TextView) findViewById(R.id.letter_count)).setText(Integer.toString(editable.toString().length()));
+                mClose.setActivated(mShowBack);
+                mShowBack = false;
             }
         });
-        findViewById(R.id.close).setOnClickListener(new OnClickListener() {
+        mClose = (ImageView) findViewById(R.id.close);
+        mClose.setOnClickListener(new OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 if (mEditText.getText().length() < 1) return;
-                setText(Character.toString(mEditText.getText().charAt(0)));
-                mEditText.setSelection(1);
+                if (mEditText.getText().length() > 1) {
+                    mShowBack = true;
+                    mOldText = mEditText.getText().toString();
+                    setText(Character.toString(mEditText.getText().charAt(0)));
+                    mEditText.setSelection(1);
+                } else {
+                    setText(mOldText);
+                }
             }
         });
         mEditText.setOnFocusChangeListener(new OnFocusChangeListener() {

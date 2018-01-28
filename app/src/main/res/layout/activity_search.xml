@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/search_starts"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textSize="11dp"
+            android:maxLines="1"
+            android:digits="@string/alphabet"
+            android:hint="Starts with"/>
+
+        <EditText
+            android:id="@+id/search_has_all_of"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:digits="@string/alphabet"
+            android:textSize="11dp"
+            android:maxLines="1"
+            android:hint="Has all of"/>
+
+        <EditText
+            android:id="@+id/search_has_any_of"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:digits="@string/alphabet"
+            android:textSize="11dp"
+            android:maxLines="1"
+            android:hint="Has any of"/>
+
+        <EditText
+            android:id="@+id/search_has_none_of"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:digits="@string/alphabet"
+            android:textSize="11dp"
+            android:maxLines="1"
+            android:hint="Has none of"/>
+
+        <EditText
+            android:id="@+id/search_letters"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:digits="1234567890"
+            android:textSize="11dp"
+            android:maxLines="1"
+            android:hint="Let."/>
+
+        <EditText
+            android:id="@+id/search_consonants"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:digits="1234567890"
+            android:textSize="11dp"
+            android:maxLines="1"
+            android:hint="Cons."/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </FrameLayout>
+
+</LinearLayout>

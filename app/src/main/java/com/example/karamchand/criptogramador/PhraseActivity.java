@@ -21,7 +21,6 @@ public class PhraseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
         setContentView(R.layout.activity_phrase);
         findViewById(R.id.button_restart).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,7 +81,7 @@ public class PhraseActivity extends AppCompatActivity {
         for (int i = 0; i < 6; i++)
             s = s.replace("áéíóúü".charAt(i), "aeiouu".charAt(i));
 
-        return s.replaceAll("[^a-z]", "");
+        return s.replaceAll("[^a-zñ]", "");
     }
 
     public void reset() {
