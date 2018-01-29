@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-class SearchAdapter extends RecyclerView.Adapter {
+public class SearchAdapter extends RecyclerView.Adapter {
     private final ArrayList<String> mCorpus;
     private final ArrayList<String> mAlphaCorpus;
     private ArrayList<String> mFilteredCorpus;
@@ -17,7 +17,7 @@ class SearchAdapter extends RecyclerView.Adapter {
     public SearchAdapter(ArrayList<String> mCorpus, ArrayList<String> mAlphaCorpus) {
         this.mCorpus = mCorpus;
         this.mAlphaCorpus = mAlphaCorpus;
-        this.mFilteredCorpus = (ArrayList<String>) this.mCorpus.clone();
+        mFilteredCorpus = (ArrayList<String>) this.mCorpus.clone();
         mFilteredCorpus.add(0, Integer.toString(mFilteredCorpus.size()));
         mFilters = new ArrayList<>();
         for (int i = 0; i < 6; i++) mFilters.add("");
@@ -56,7 +56,6 @@ class SearchAdapter extends RecyclerView.Adapter {
     }
 
     private boolean fitsfilters(String string, ArrayList<String> mFilters) {
-//        string = PhraseActivity.toAlpha(string);
         String starts = mFilters.get(SearchActivity.STARTS);
         if (!(starts.length() == 0) && !starts.contains(Character.toString(string.charAt(0))))
             return false;
@@ -73,7 +72,7 @@ class SearchAdapter extends RecyclerView.Adapter {
             return false;
         String consonants = mFilters.get(SearchActivity.CONSONANTS);
         if (!(consonants.length() == 0) &&
-                !(Integer.parseInt(consonants) <= string.replaceAll("a|e|i|o|u", "").length()))
+                !(Integer.parseInt(consonants) <= substring.replaceAll("a|e|i|o|u", "").length()))
             return false;
         return true;
     }
