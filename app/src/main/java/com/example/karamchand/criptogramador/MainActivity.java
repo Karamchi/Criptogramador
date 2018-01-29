@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     private ArrayList<String> mState = new ArrayList<>();
     private SharedPreferences sp;
     private EditText mPhrase;
+    private boolean mRestoring;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     @Override
     public void onWordChanged(int index, String newWord) {
         mState.set(index, newWord);
+        if (mRestoring) return;
         mLettersView.update(new Data(mState));
         sp.edit().putString(Integer.toString(index), newWord).apply();
     }
@@ -167,11 +169,14 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     protected void onResume() {
         super.onResume();
         if (!mState.isEmpty()) return;
+        mRestoring = true;
         int i;
         for (i = 0; true; i++) {
             if (!sp.contains(Integer.toString(i))) break;
             else mWordsView.setWord(i, sp.getString(Integer.toString(i), ""));
         }
+        mRestoring = false;
+        mLettersView.update(new Data(mState));
         setPhrase(sp.getString("phrase", ""));
         mLettersView.setTotalWords(i);
     }
