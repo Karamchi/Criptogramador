@@ -8,14 +8,18 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class SearchActivity extends AppCompatActivity {
+import static android.view.View.GONE;
+
+public class SearchActivity extends AppCompatActivity implements SearchAdapter.SearchListener {
 
     public static final int STARTS = 0;
     public static final int HAS_ANY = 1;
@@ -36,7 +40,7 @@ public class SearchActivity extends AppCompatActivity {
         mRecycler = (RecyclerView) findViewById(R.id.recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         read();
-        adapter = new SearchAdapter(mCorpus, mAlphaCorpus);
+        adapter = new SearchAdapter(mCorpus, mAlphaCorpus, this);
         mRecycler.setAdapter(adapter);
         ((EditText) findViewById(R.id.search_starts)).addTextChangedListener(getTextWatcher(STARTS));
         ((EditText) findViewById(R.id.search_has_all_of)).addTextChangedListener(getTextWatcher(HAS_ALL));
@@ -56,6 +60,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
+                findViewById(R.id.loading).setVisibility(View.VISIBLE);
                 adapter.filter(editable.toString(), filterType);
             }
         };
@@ -88,4 +93,9 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onDataSearched(int size) {
+        findViewById(R.id.loading).setVisibility(GONE);
+        ((TextView) findViewById(R.id.number)).setText(Integer.toString(size));
+    }
 }
