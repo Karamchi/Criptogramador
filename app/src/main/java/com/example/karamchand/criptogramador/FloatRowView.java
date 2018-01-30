@@ -3,7 +3,7 @@ package com.example.karamchand.criptogramador;
 import android.content.Context;
 import android.widget.TextView;
 
-class FloatRowView extends RowView {
+public class FloatRowView extends RowView {
 
     private double mTotalDivisor;
     private double mDivisor;

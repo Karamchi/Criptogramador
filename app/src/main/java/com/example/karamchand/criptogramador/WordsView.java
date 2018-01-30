@@ -5,13 +5,14 @@ import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
 public class WordsView extends LinearLayout {
 
-    private OnWordChangedListener w;
+    private OnWordChangedListener onWordChangedListener;
     private ArrayList<WordView> mChildren = new ArrayList<>();
 
     public WordsView(Context context) {
@@ -34,7 +35,7 @@ public class WordsView extends LinearLayout {
     }
 
     public void setOnWordChangedListener(OnWordChangedListener w) {
-        this.w = w;
+        onWordChangedListener = w;
     }
 
     public void setTitleAuthor(String titleAuthor) {
@@ -59,7 +60,7 @@ public class WordsView extends LinearLayout {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                w.onWordChanged(index, editable.toString());
+                onWordChangedListener.onWordChanged(index, editable.toString());
             }
         };
     }
@@ -71,15 +72,29 @@ public class WordsView extends LinearLayout {
             if ((i < 0) || (i > 30)) return;
             WordView newView = new WordView(getContext());
             newView.addTextChangedListener(getTextWatcher(i));
+            newView.setOnFocusChangeListener(getOnFocusChangeListener(i));
             mChildren.add(newView);
             addView(newView);
-            w.onWordAdded();
+            onWordChangedListener.onWordAdded();
             setWord(i, string);
         }
     }
 
+    private OnFocusChangeListener getOnFocusChangeListener(final int i) {
+        return new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    onWordChangedListener.onWordUnfocused(i);
+                }
+            }
+        };
+    }
+
     public interface OnWordChangedListener {
         void onWordChanged(int index, String newWord);
+
+        void onWordUnfocused(int index);
 
         void onWordAdded();
     }

@@ -57,7 +57,7 @@ public class LettersView extends LinearLayout {
         mWords.resetTotal(mTotalWords);
     }
 
-    public void updatePhrase(MainActivity.Data data) {
+    public void updatePhrase(Data data) {
         for (char row : mChildren.keySet()) {
             mChildren.get(row).setTotal(data.getCount(row));
         }
@@ -67,7 +67,7 @@ public class LettersView extends LinearLayout {
         mLetrasXPal.setTotal(data.getCount());
     }
 
-    public void update(MainActivity.Data data) {
+    public void update(Data data) {
         for (char row : mChildren.keySet()) {
             mChildren.get(row).setAmount(data.getCount(row));
         }

@@ -12,12 +12,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-class WordView extends LinearLayout {
+import java.util.Objects;
+
+public class WordView extends LinearLayout {
 
     private EditText mEditText;
-    private String mOldText;
-    private ImageView mClose;
-    public boolean mShowBack;
+    private String oldText;
 
     public WordView(Context context) {
         super(context);
@@ -48,33 +48,33 @@ class WordView extends LinearLayout {
             @Override
             public void afterTextChanged(Editable editable) {
                 ((TextView) findViewById(R.id.letter_count)).setText(Integer.toString(editable.toString().length()));
-                mClose.setActivated(mShowBack);
-                mShowBack = false;
             }
         });
-        mClose = (ImageView) findViewById(R.id.close);
-        mClose.setOnClickListener(new OnClickListener() {
+        findViewById(R.id.close).setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                if (mEditText.getText().length() < 1) return;
-                if (mEditText.getText().length() > 1) {
-                    mShowBack = true;
-                    mOldText = mEditText.getText().toString();
-                    setText(Character.toString(mEditText.getText().charAt(0)));
-                    mEditText.setSelection(1);
-                } else {
-                    setText(mOldText);
-                }
+            if (mEditText.getText().length() > 1) {
+                mEditText.requestFocus();
+                setText(Character.toString(mEditText.getText().charAt(0)));
+                mEditText.setSelection(1);
+            }
             }
         });
+    }
+
+    @Override
+    public void setOnFocusChangeListener(final OnFocusChangeListener l) {
         mEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
                 if (b) {
+                    oldText = mEditText.getText().toString();
                     mEditText.setBackgroundColor(Color.DKGRAY);
                 } else {
                     mEditText.setBackgroundColor(Color.TRANSPARENT);
+                    if (!oldText.equals(mEditText.getText().toString()))
+                        l.onFocusChange(WordView.this, b);
                 }
             }
         });
