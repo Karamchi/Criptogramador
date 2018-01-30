@@ -39,6 +39,8 @@ public class WordsView extends LinearLayout {
     }
 
     public void setTitleAuthor(String titleAuthor) {
+        removeAllViews();
+        mChildren = new ArrayList<>();
         for (int i = 0; i < titleAuthor.length(); i++) {
             WordView newView = new WordView(getContext());
             newView.addTextChangedListener(getTextWatcher(i));
@@ -75,7 +77,6 @@ public class WordsView extends LinearLayout {
             newView.setOnFocusChangeListener(getOnFocusChangeListener(i));
             mChildren.add(newView);
             addView(newView);
-            onWordChangedListener.onWordAdded();
             setWord(i, string);
         }
     }
@@ -95,8 +96,6 @@ public class WordsView extends LinearLayout {
         void onWordChanged(int index, String newWord);
 
         void onWordUnfocused(int index);
-
-        void onWordAdded();
     }
 
 }

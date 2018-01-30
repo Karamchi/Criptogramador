@@ -1,9 +1,7 @@
 package com.example.karamchand.criptogramador;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -33,16 +31,15 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     private LettersView mLettersView;
     private WordsView mWordsView;
     private ArrayList<String> mState = new ArrayList<>();
-    private SharedPreferences sp;
     private EditText mPhrase;
     private boolean mRestoring;
     private Deque<ArrayList<String>> mHistory = new ArrayDeque<>();
+    private final static  String PATH = Environment.getExternalStorageDirectory() + "/crip";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sp = getSharedPreferences("private-shared-prefs", Activity.MODE_PRIVATE);
         mWordsView = ((WordsView) findViewById(R.id.words_view));
         mWordsView.setOnWordChangedListener(this);
         mLettersView = (LettersView) findViewById(R.id.letters_view);
@@ -58,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
             @Override
             public void afterTextChanged(Editable editable) {
                 mLettersView.updatePhrase(new Data(editable.toString()));
-                sp.edit().putString("phrase", editable.toString()).apply();
             }
         });
 
@@ -69,13 +65,6 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
                 else mPhrase.setBackgroundColor(Color.TRANSPARENT);
             }
         });
-
-        //Si el intent viene con author, lo seteamos y tiramos todo
-        //Si no, restoreamos sharedpreferences
-        if (getIntent().hasExtra("title"))
-            setTitleAuthor(getIntent().getStringExtra("title"));
-        if (getIntent().hasExtra("phrase"))
-            setPhrase(getIntent().getStringExtra("phrase"));
 
         setupToolbar();
     }
@@ -107,19 +96,17 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         });
     }
 
-    private String[] mFileList;
 
     private void load() {
-        final File dir = new File(Environment.getExternalStorageDirectory() + "/crip");
+        final File dir = new File(PATH);
         dir.mkdirs();
-        if (dir.exists())
-            mFileList = dir.list();
+        final String[] mFileList = dir.list();
         if (mFileList == null) return;
         new AlertDialog.Builder(this)
             .setTitle("Load file")
             .setItems(mFileList, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    readFromFile(dir + "/" + mFileList[which]);
+                    readFromFile(mFileList[which]);
                 }
             })
             .show();
@@ -127,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
 
     private void readFromFile(String filename) {
         try {
-            FileInputStream fIn = new FileInputStream(new File(filename));
+            FileInputStream fIn = new FileInputStream(new File(PATH + "/" + filename));
             BufferedReader reader = new BufferedReader(new InputStreamReader(fIn));
 
             mState = new ArrayList<>();
@@ -136,20 +123,26 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
             while ((line = reader.readLine()) != null)
                 mState.add(line);
             restoreFromState();
+            onWordUnfocused(0);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void save() {
-        File dir = new File(Environment.getExternalStorageDirectory() + "/crip");
-        dir.mkdirs();
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(System.currentTimeMillis());
         String filename = new Date(System.currentTimeMillis()).toString()
                 + "_" + c.get(Calendar.HOUR)
                 + ":" + c.get(Calendar.MINUTE)
                 + ":" + c.get(Calendar.SECOND);
+        save(filename);
+        Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
+    }
+
+    private void save(String filename) {
+        File dir = new File(PATH);
+        dir.mkdirs();
         File file = new File(dir, filename + ".txt");
 
         try {
@@ -164,14 +157,13 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Toast.makeText(this, "File written to " + file, Toast.LENGTH_SHORT).show();
 
     }
 
     private void setTitleAuthor(String s) {
-        sp.edit().clear().apply();
         s = PhraseActivity.toAlpha(s);
 
+        mState = new ArrayList<>();
         for (int i = 0; i< s.length(); i++)
             mState.add("");
         mWordsView.setTitleAuthor(s);
@@ -193,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         }
         mState = backup;
         restoreFromState();
+        Toast.makeText(this, "Undo", Toast.LENGTH_SHORT).show();
     }
 
     public void restoreFromState() {
@@ -202,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         }
         mRestoring = false;
         mLettersView.update(new Data(mState));
+        mLettersView.setTotalWords(mState.size());
     }
 
     @Override
@@ -217,27 +211,25 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         if (mHistory.size() > 10) {
             mHistory.removeLast();
         }
-        sp.edit().putString(Integer.toString(index), mState.get(index)).apply();
-    }
-
-    public void onWordAdded(){
-        mState.add("");
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (!mState.isEmpty()) return;
-        mRestoring = true;
-        int i;
-        for (i = 0; true; i++) {
-            if (!sp.contains(Integer.toString(i))) break;
-            else mWordsView.setWord(i, sp.getString(Integer.toString(i), ""));
-        }
-        mRestoring = false;
-        mLettersView.update(new Data(mState));
-        setPhrase(sp.getString("phrase", ""));
-        mLettersView.setTotalWords(i);
-        onWordUnfocused(0);
+    protected void onStop() {
+        save("temp");
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        readFromFile("temp.txt");
+
+        //Si el intent viene con author, lo seteamos y tiramos todo
+        //Si no, restoreamos sharedpreferences
+        if (getIntent().hasExtra("title"))
+            setTitleAuthor(getIntent().getStringExtra("title"));
+        if (getIntent().hasExtra("phrase"))
+            setPhrase(getIntent().getStringExtra("phrase"));
     }
 }
