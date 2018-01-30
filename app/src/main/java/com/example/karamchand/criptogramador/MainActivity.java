@@ -1,7 +1,6 @@
 package com.example.karamchand.criptogramador;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,18 +16,17 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.sql.Date;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Deque;
-import java.util.HashMap;
-
-import static com.example.karamchand.criptogramador.LettersView.VOCALES;
 
 public class MainActivity extends AppCompatActivity implements WordsView.OnWordChangedListener {
 
@@ -52,12 +50,10 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         mPhrase = (EditText) findViewById(R.id.phrase);
         mPhrase.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
             public void afterTextChanged(Editable editable) {
@@ -69,11 +65,8 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         mPhrase.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-                if (b) {
-                    mPhrase.setBackgroundColor(Color.DKGRAY);
-                } else {
-                    mPhrase.setBackgroundColor(Color.TRANSPARENT);
-                }
+                if (b) mPhrase.setBackgroundColor(Color.DKGRAY);
+                else mPhrase.setBackgroundColor(Color.TRANSPARENT);
             }
         });
 
@@ -83,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
             setTitleAuthor(getIntent().getStringExtra("title"));
         if (getIntent().hasExtra("phrase"))
             setPhrase(getIntent().getStringExtra("phrase"));
+
         setupToolbar();
     }
 
@@ -113,24 +107,38 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         });
     }
 
-    private String mChosenFile;
     private String[] mFileList;
 
     private void load() {
-        File dir = new File(Environment.getExternalStorageDirectory() + "/crip");
+        final File dir = new File(Environment.getExternalStorageDirectory() + "/crip");
         dir.mkdirs();
         if (dir.exists())
             mFileList = dir.list();
         if (mFileList == null) return;
         new AlertDialog.Builder(this)
-        .setTitle("Choose your file")
-        .setItems(mFileList, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                mChosenFile = mFileList[which];
-                //you can do stuff with the file here too
-            }
-        })
-        .show();
+            .setTitle("Load file")
+            .setItems(mFileList, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    readFromFile(dir + "/" + mFileList[which]);
+                }
+            })
+            .show();
+    }
+
+    private void readFromFile(String filename) {
+        try {
+            FileInputStream fIn = new FileInputStream(new File(filename));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fIn));
+
+            mState = new ArrayList<>();
+            String line = reader.readLine();
+            setPhrase(line);
+            while ((line = reader.readLine()) != null)
+                mState.add(line);
+            restoreFromState();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void save() {
@@ -184,6 +192,10 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
             backup = mHistory.getFirst();
         }
         mState = backup;
+        restoreFromState();
+    }
+
+    public void restoreFromState() {
         mRestoring = true;
         for (int i = 0; i < mState.size(); i++) {
             mWordsView.setWord(i, mState.get(i));
