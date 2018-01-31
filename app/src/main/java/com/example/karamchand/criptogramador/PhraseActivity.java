@@ -76,12 +76,19 @@ public class PhraseActivity extends AppCompatActivity {
         };
     }
 
-    public static String toAlpha(String s) {
+    public static String toAlpha(String s, boolean b) {
         s = s.toLowerCase();
         for (int i = 0; i < 6; i++)
             s = s.replace("áéíóúü".charAt(i), "aeiouu".charAt(i));
 
-        return s.replaceAll("[^a-zñ]", "");
+        if (b)
+            return s.replaceAll("[^a-z ñ]", "");
+        else
+            return s.replaceAll("[^a-zñ]", "");
+    }
+
+    public static String toAlpha(String phrase) {
+        return toAlpha(phrase, false);
     }
 
     public void reset() {
@@ -90,5 +97,4 @@ public class PhraseActivity extends AppCompatActivity {
         intent.putExtra("title", ((EditText) findViewById(R.id.title)).getText().toString());
         startActivity(intent);
     }
-
 }

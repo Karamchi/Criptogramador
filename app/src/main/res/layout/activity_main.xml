@@ -27,6 +27,14 @@
                 android:layout_weight="11"/>
 
             <ImageView
+                android:id="@+id/finish"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:visibility="gone"
+                android:src="@drawable/arrow_right"/>
+
+            <ImageView
                 android:id="@+id/save"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -46,7 +54,6 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
                 android:src="@android:drawable/ic_menu_search"/>
-
 
         </LinearLayout>
 

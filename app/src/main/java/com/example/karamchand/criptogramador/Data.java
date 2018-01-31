@@ -1,8 +1,14 @@
 package com.example.karamchand.criptogramador;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import android.widget.EditText;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import static com.example.karamchand.criptogramador.LettersView.ALPHABET;
 import static com.example.karamchand.criptogramador.LettersView.VOCALES;
 
 public class Data {
@@ -64,4 +70,11 @@ public class Data {
         return validSum;
     }
 
+    public boolean isFinished(String mPhrase) {
+        List<String> phrase = Arrays.asList(mPhrase.split(""));
+        for (char c : ALPHABET.toCharArray()) {
+            if (getCount(c) != Collections.frequency(phrase, Character.toString(c))) return false;
+        }
+        return true;
+    }
 }

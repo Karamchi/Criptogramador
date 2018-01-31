@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
             @Override
             public void afterTextChanged(Editable editable) {
                 mLettersView.updatePhrase(new Data(editable.toString()));
+                checkIfFinished();
             }
         });
 
@@ -94,6 +97,15 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
                 load();
             }
         });
+        findViewById(R.id.finish).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, PrintActivity.class);
+                intent.putExtra("phrase", mPhrase.getText().toString());
+                intent.putExtra("words", mState);
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -124,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
                 mState.add(line);
             restoreFromState();
             onWordUnfocused(0);
+            checkIfFinished();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,10 +145,9 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     private void save() {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(System.currentTimeMillis());
-        String filename = new Date(System.currentTimeMillis()).toString()
-                + "_" + c.get(Calendar.HOUR)
-                + ":" + c.get(Calendar.MINUTE)
-                + ":" + c.get(Calendar.SECOND);
+        SimpleDateFormat format = new SimpleDateFormat("yy_MM_dd_hh_mm_ss");
+        String filename = mPhrase.getText().subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_")
+                + "_" + format.format(c.getTime());
         save(filename);
         Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
     }
@@ -202,7 +214,14 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     public void onWordChanged(int index, String newWord) {
         mState.set(index, newWord);
         if (mRestoring) return;
-        mLettersView.update(new Data(mState));
+        Data data = new Data(mState);
+        mLettersView.update(data);
+        checkIfFinished();
+    }
+
+    private void checkIfFinished() {
+        boolean finished = new Data(mState).isFinished(PhraseActivity.toAlpha(mPhrase.getText().toString()));
+        findViewById(R.id.finish).setVisibility(finished ? View.VISIBLE : View.GONE);
     }
 
     @Override

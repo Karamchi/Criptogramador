@@ -15,6 +15,8 @@
         </activity>
         <activity android:name=".SearchActivity">
         </activity>
+        <activity android:name=".PrintActivity">
+        </activity>
         <activity android:name=".PhraseActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
