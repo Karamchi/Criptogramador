@@ -94,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         });
     }
 
-
     private void load() {
         FileUtils.load(this, this, "");
     }
@@ -119,7 +118,9 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     }
 
     private void save(String filename) {
-        FileUtils.save("", filename, mState);
+        ArrayList<String> content = (ArrayList<String>) mState.clone();
+        content.add(0, mPhrase.getText().toString());
+        FileUtils.save("", filename, content);
     }
 
     private void setTitleAuthor(String s) {
@@ -192,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     protected void onStart() {
         super.onStart();
 
-        mState = FileUtils.readFromFile("temp.txt");
+        mState = FileUtils.readFromFile("", "temp.txt");
 
         setPhrase(mState.remove(0));
         restoreFromState();

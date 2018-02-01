@@ -48,7 +48,7 @@ public class FileUtils {
         }
     }
 
-    public static void load(Context context, final LoadListener listener, String path) {
+    public static void load(Context context, final LoadListener listener, final String path) {
         final File dir = new File(ROOT + path);
         dir.mkdirs();
         final String[] mFileList = dir.list();
@@ -57,16 +57,16 @@ public class FileUtils {
                 .setTitle("Load file")
                 .setItems(mFileList, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        listener.onLoad(readFromFile(mFileList[which]));
+                        listener.onLoad(readFromFile(path, mFileList[which]));
                     }
                 })
                 .show();
     }
 
-    public static ArrayList<String> readFromFile(String filename) {
+    public static ArrayList<String> readFromFile(String path, String filename) {
         ArrayList<String> result = new ArrayList<>();
         try {
-            FileInputStream fIn = new FileInputStream(new File(ROOT + "/" + filename));
+            FileInputStream fIn = new FileInputStream(new File(ROOT + path + "/" + filename));
             BufferedReader reader = new BufferedReader(new InputStreamReader(fIn));
 
             String line;
