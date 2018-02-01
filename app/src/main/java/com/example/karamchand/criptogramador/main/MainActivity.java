@@ -1,4 +1,4 @@
-package com.example.karamchand.criptogramador;
+package com.example.karamchand.criptogramador.main;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -10,6 +10,13 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.karamchand.criptogramador.FileUtils;
+import com.example.karamchand.criptogramador.LettersView;
+import com.example.karamchand.criptogramador.PhraseActivity;
+import com.example.karamchand.criptogramador.PrintActivity;
+import com.example.karamchand.criptogramador.R;
+import com.example.karamchand.criptogramador.SearchActivity;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

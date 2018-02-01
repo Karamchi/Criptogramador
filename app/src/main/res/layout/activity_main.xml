@@ -74,7 +74,7 @@
             android:paddingRight="4dp"
             android:paddingBottom="4dp">
 
-            <com.example.karamchand.criptogramador.WordsView
+            <com.example.karamchand.criptogramador.main.WordsView
                 android:id="@+id/words_view"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

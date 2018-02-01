@@ -1,10 +1,12 @@
-package com.example.karamchand.criptogramador;
+package com.example.karamchand.criptogramador.main;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.example.karamchand.criptogramador.R;
 
 public class RowView extends LinearLayout {
 

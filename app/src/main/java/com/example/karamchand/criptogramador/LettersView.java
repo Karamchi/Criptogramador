@@ -5,7 +5,10 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
-import java.util.ArrayList;
+import com.example.karamchand.criptogramador.main.Data;
+import com.example.karamchand.criptogramador.main.FloatRowView;
+import com.example.karamchand.criptogramador.main.RowView;
+
 import java.util.HashMap;
 
 public class LettersView extends LinearLayout {

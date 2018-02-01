@@ -14,6 +14,8 @@ import android.widget.TextView;
 public class CellView extends LinearLayout {
     private CellView mTwin;
     private EditText mInput;
+    private CellView mPrevious;
+    private CellView mNext;
 
     public CellView(Context context) {
         super(context);
@@ -46,6 +48,14 @@ public class CellView extends LinearLayout {
                 if (mTwin != null && !mTwin.getInput().equals(editable.toString())) {
                     mTwin.setInput(editable.toString());
                 }
+                if (editable.toString().equals("")) {
+                    if (mPrevious != null)
+                        mPrevious.requestFocus();
+                } else {
+                    if (mNext != null) {
+                        mNext.requestFocus();
+                    }
+                }
             }
         });
     }
@@ -76,5 +86,13 @@ public class CellView extends LinearLayout {
 
     public void setInput(String input) {
         mInput.setText(input);
+    }
+
+    public void setPrevious(CellView previous) {
+        mPrevious = previous;
+    }
+
+    public void setNext(CellView next) {
+        mNext = next;
     }
 }

@@ -16,6 +16,7 @@ import static com.example.karamchand.criptogramador.LettersView.ALPHABET;
 public class PrintActivity extends AppCompatActivity implements FileUtils.LoadListener {
 
     private static final String PATH = "/finished";
+    private static final int ROW_WIDTH = 10;
     private String mPhrase;
     private ArrayList<String> mWords;
     private HashMap<Character, ArrayList<Integer>> mIndexes;
@@ -29,6 +30,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private String mPhraseAlpha;
     private LinearLayout mLayout;
     private LinearLayout mLastRow;
+    private CellView mLastAdded;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -115,14 +117,15 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             }
             addRow();
         }
-        for (int i = 0; i< mCellLetters.size(); i++) {
+        for (int i = 0; i < mCellLetters.size(); i++) {
             if (mCellLetters.get(i) == ' ')
                 addBlackCell();
             else
                 addCell(mCellLetters.get(i), mCellNumbers.get(i));
-            if (i % 20 == 19)
+            if ((i + 1) % ROW_WIDTH == 0)
                 addRow();
         }
+        addRow();
     }
 
     private void addRow() {
@@ -137,6 +140,9 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         else
             mCells.put(i, v);
         mLastRow.addView(v);
+        v.setPrevious(mLastAdded);
+        if (mLastAdded != null) mLastAdded.setNext(v);
+        mLastAdded = v;
     }
 
     private void addBlackCell() {
@@ -160,12 +166,14 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             } else {
                 word += " \t";
             }
-            if ((i + 1) % 20 == 0) {
+            if ((i + 1) % ROW_WIDTH == 0) {
                 content.add(word);
                 content.add("");
                 word = "";
             }
         }
+        content.add(word);
+        content.add("");
         String filename = FileUtils.saveWithTimeStamp(
                 mPhrase.subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_"),
                 PATH,

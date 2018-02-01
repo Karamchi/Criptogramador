@@ -1,4 +1,4 @@
-package com.example.karamchand.criptogramador;
+package com.example.karamchand.criptogramador.main;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -8,11 +8,10 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.Objects;
+import com.example.karamchand.criptogramador.R;
 
 public class WordView extends LinearLayout {
 

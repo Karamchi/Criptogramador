@@ -1,4 +1,4 @@
-package com.example.karamchand.criptogramador;
+package com.example.karamchand.criptogramador.main;
 
 import android.content.Context;
 import android.support.annotation.Nullable;

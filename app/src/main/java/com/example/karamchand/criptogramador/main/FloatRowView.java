@@ -1,7 +1,9 @@
-package com.example.karamchand.criptogramador;
+package com.example.karamchand.criptogramador.main;
 
 import android.content.Context;
 import android.widget.TextView;
+
+import com.example.karamchand.criptogramador.R;
 
 public class FloatRowView extends RowView {
 

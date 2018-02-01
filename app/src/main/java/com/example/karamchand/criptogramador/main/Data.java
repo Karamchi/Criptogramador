@@ -1,15 +1,13 @@
-package com.example.karamchand.criptogramador;
+package com.example.karamchand.criptogramador.main;
 
-import android.widget.EditText;
+import com.example.karamchand.criptogramador.LettersView;
+import com.example.karamchand.criptogramador.PhraseActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
-import static com.example.karamchand.criptogramador.LettersView.ALPHABET;
-import static com.example.karamchand.criptogramador.LettersView.VOCALES;
 
 public class Data {
     private HashMap<Character, Integer> counter;
@@ -41,7 +39,7 @@ public class Data {
                 counter.put(c, counter.get(c) + 1);
             else
                 counter.put(c, 1);
-            if (VOCALES.contains(Character.toString(c)))
+            if (LettersView.VOCALES.contains(Character.toString(c)))
                 vocales++;
             sum++;
         }
@@ -72,7 +70,7 @@ public class Data {
 
     public boolean isFinished(String mPhrase) {
         List<String> phrase = Arrays.asList(mPhrase.split(""));
-        for (char c : ALPHABET.toCharArray()) {
+        for (char c : LettersView.ALPHABET.toCharArray()) {
             if (getCount(c) != Collections.frequency(phrase, Character.toString(c))) return false;
         }
         return true;
