@@ -58,7 +58,7 @@ public class FileUtils {
                 .setItems(mFileList, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 //                        dialog.dismiss();
-                        listener.onLoad(readFromFile(path, mFileList[which]));
+                        listener.onLoad(readFromFile(path, mFileList[which]), mFileList[which]);
                     }
                 })
                 .show();
@@ -81,6 +81,6 @@ public class FileUtils {
     }
 
     public interface LoadListener {
-        void onLoad(ArrayList<String> s);
+        void onLoad(ArrayList<String> s, String filename);
     }
 }

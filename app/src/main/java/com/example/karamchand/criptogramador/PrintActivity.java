@@ -3,6 +3,7 @@ package com.example.karamchand.criptogramador;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -18,16 +19,14 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private static final String PATH = "/finished";
     private static final int ROW_WIDTH = 10;
     private String mPhrase;
-    private ArrayList<String> mWords;
-    private HashMap<Character, ArrayList<Integer>> mIndexes;
-    private HashMap<Integer, Character> mLettersForPhrasePos;
+    private String mFileId;
 
     private ArrayList<ArrayList<Integer>> mLettersState = new ArrayList<>();
     private ArrayList<Character> mCellLetters = new ArrayList<>();
     private ArrayList<Integer> mCellNumbers = new ArrayList<>();
     private HashMap<Integer, CellView> mCells;
+    private HashMap<Integer, Character> mPunctuation;
 
-    private String mPhraseAlpha;
     private LinearLayout mLayout;
     private LinearLayout mLastRow;
     private CellView mLastAdded;
@@ -38,10 +37,6 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         setContentView(R.layout.activity_print);
         mLayout = (LinearLayout) findViewById(R.id.activity_print_layout);
         if (getIntent().hasExtra("words")) {
-            mPhrase = PhraseActivity.toAlpha(getIntent().getStringExtra("phrase").toLowerCase(), true);
-            mPhraseAlpha = mPhrase.replace(" ", "");
-            mWords = (ArrayList<String>) getIntent().getExtras().get("words");
-
             generate();
             restoreFromState();
         } else {
@@ -66,32 +61,38 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     public void generate() {
-        mIndexes = new HashMap<>();
-        mLettersForPhrasePos = new HashMap<>();
+        mPhrase = PhraseActivity.toAlpha(getIntent().getStringExtra("phrase").toLowerCase(), true);
+        mFileId = mPhrase.subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_");
+        String mPhraseAlpha = mPhrase.replace(" ", "");
+        ArrayList<String> mWords = (ArrayList<String>) getIntent().getExtras().get("words");
+
+        HashMap<Character, ArrayList<Integer>> indexes = new HashMap<>();
+        HashMap<Integer, Character> lettersForPhrasePos = new HashMap<>();
+
         for (int i = 0; i < mWords.size(); i++)
             mLettersState.add(new ArrayList<Integer>());
 
         for (int i = 0; i < mPhraseAlpha.length(); i++) {
             char c = mPhraseAlpha.charAt(i);
-            if (mIndexes.containsKey(c)) {
-                ArrayList<Integer> oldArray = mIndexes.get(c);
+            if (indexes.containsKey(c)) {
+                ArrayList<Integer> oldArray = indexes.get(c);
                 oldArray.add(i);
                 Collections.shuffle(oldArray);
-                mIndexes.put(c, oldArray);
+                indexes.put(c, oldArray);
             } else {
                 ArrayList<Integer> array = new ArrayList<>();
                 array.add(i);
-                mIndexes.put(c, array);
+                indexes.put(c, array);
             }
         }
 
         mLastRow = new LinearLayout(this);
-        for (int i = 0; i<mWords.size(); i++) {
+        for (int i = 0; i< mWords.size(); i++) {
             String word = mWords.get(i);
             for (char c : word.toCharArray()) {
-                int index = mIndexes.get(c).remove(0);
+                int index = indexes.get(c).remove(0);
                 mLettersState.get(i).add(index);
-                mLettersForPhrasePos.put(index, ALPHABET.toUpperCase().charAt(mWords.indexOf(word)));
+                lettersForPhrasePos.put(index, ALPHABET.toUpperCase().charAt(mWords.indexOf(word)));
             }
         }
 
@@ -100,7 +101,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             if (mPhrase.charAt(i) == ' ') {
                 mCellLetters.add(' ');
             } else {
-                mCellLetters.add(mLettersForPhrasePos.get(letterPosition));
+                mCellLetters.add(lettersForPhrasePos.get(letterPosition));
                 letterPosition++;
             }
             mCellNumbers.add(letterPosition);
@@ -174,10 +175,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         }
         content.add(word);
         content.add("");
-        String filename = FileUtils.saveWithTimeStamp(
-                mPhrase.subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_"),
-                PATH,
-                content);
+        String filename = FileUtils.saveWithTimeStamp(mFileId, PATH, content);
         Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
     }
 
@@ -186,7 +184,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     @Override
-    public void onLoad(ArrayList<String> contents) {
+    public void onLoad(ArrayList<String> contents, String filename) {
+        mFileId = filename.substring(0, 8);
         mCellLetters = new ArrayList<>();
         mLettersState = new ArrayList<>();
         mLayout.removeAllViews();
@@ -219,4 +218,11 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         }
         restoreFromState();
     }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        View v = getCurrentFocus();
+        v.onKeyDown(keyCode, event);
+        return super.onKeyDown(keyCode, event);
+    }
+
 }

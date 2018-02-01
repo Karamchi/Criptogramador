@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     }
 
     @Override
-    public void onLoad(ArrayList<String> s) {
+    public void onLoad(ArrayList<String> s, String filename) {
         mState = s;
         setPhrase(mState.remove(0));
         restoreFromState();
