@@ -1,13 +1,18 @@
 package com.example.karamchand.criptogramador;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,6 +24,7 @@ import static com.example.karamchand.criptogramador.LettersView.ALPHABET;
 
 public class PrintActivity extends AppCompatActivity {
 
+    private static final String PATH = "/finished";
     private String mPhrase;
     private ArrayList<String> mWords;
     private HashMap<Character, ArrayList<Integer>> mIndexes;
@@ -85,7 +91,6 @@ public class PrintActivity extends AppCompatActivity {
         }
 
         addRow();
-        save();
 
     }
 
@@ -103,35 +108,6 @@ public class PrintActivity extends AppCompatActivity {
     private void addBlackCell() {
         lettersBuffer += " \t \t";
         mLastRow.addView(new CellView(this).black());
-    }
-
-    private void save() {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(System.currentTimeMillis());
-        SimpleDateFormat format = new SimpleDateFormat("yy_MM_dd_hh_mm_ss");
-        String filename = "FINISHED" +
-                mPhrase.subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_")
-                + "_" + format.format(c.getTime());
-        save(filename);
-        Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
-    }
-
-    private void save(String filename) {
-        File dir = new File(MainActivity.PATH);
-        dir.mkdirs();
-        File file = new File(dir, filename + ".txt");
-
-        try {
-            FileOutputStream f = new FileOutputStream(file);
-            PrintWriter pw = new PrintWriter(f);
-            pw.println(lettersBuffer);
-            pw.println(phrasebuffer);
-            pw.flush();
-            pw.close();
-            f.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 }

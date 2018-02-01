@@ -1,34 +1,21 @@
 package com.example.karamchand.criptogramador;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Deque;
 
-public class MainActivity extends AppCompatActivity implements WordsView.OnWordChangedListener {
+public class MainActivity extends AppCompatActivity implements WordsView.OnWordChangedListener, FileUtils.LoadListener {
 
     private LettersView mLettersView;
     private WordsView mWordsView;
@@ -36,7 +23,6 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     private EditText mPhrase;
     private boolean mRestoring;
     private Deque<ArrayList<String>> mHistory = new ArrayDeque<>();
-    public final static  String PATH = Environment.getExternalStorageDirectory() + "/crip";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -110,66 +96,30 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
 
 
     private void load() {
-        final File dir = new File(PATH);
-        dir.mkdirs();
-        final String[] mFileList = dir.list();
-        if (mFileList == null) return;
-        new AlertDialog.Builder(this)
-            .setTitle("Load file")
-            .setItems(mFileList, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    readFromFile(mFileList[which]);
-                }
-            })
-            .show();
+        FileUtils.load(this, this, "");
     }
 
-    private void readFromFile(String filename) {
-        try {
-            FileInputStream fIn = new FileInputStream(new File(PATH + "/" + filename));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(fIn));
-
-            mState = new ArrayList<>();
-            String line = reader.readLine();
-            setPhrase(line);
-            while ((line = reader.readLine()) != null)
-                mState.add(line);
-            restoreFromState();
-            onWordUnfocused(0);
-            checkIfFinished();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void onLoad(ArrayList<String> s) {
+        mState = s;
+        setPhrase(mState.remove(0));
+        restoreFromState();
+        onWordUnfocused(0);
+        checkIfFinished();
     }
 
     private void save() {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(System.currentTimeMillis());
-        SimpleDateFormat format = new SimpleDateFormat("yy_MM_dd_hh_mm_ss");
-        String filename = mPhrase.getText().subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_")
-                + "_" + format.format(c.getTime());
-        save(filename);
+        ArrayList<String> content = (ArrayList<String>) mState.clone();
+        content.add(0, mPhrase.getText().toString());
+        String filename = FileUtils.saveWithTimeStamp(
+                mPhrase.getText().subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_"),
+                "",
+                content);
         Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
     }
 
     private void save(String filename) {
-        File dir = new File(PATH);
-        dir.mkdirs();
-        File file = new File(dir, filename + ".txt");
-
-        try {
-            FileOutputStream f = new FileOutputStream(file);
-            PrintWriter pw = new PrintWriter(f);
-            pw.println(mPhrase.getText().toString());
-            for (String s : mState)
-                pw.println(s);
-            pw.flush();
-            pw.close();
-            f.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        FileUtils.save("", filename, mState);
     }
 
     private void setTitleAuthor(String s) {
@@ -242,7 +192,10 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     protected void onStart() {
         super.onStart();
 
-        readFromFile("temp.txt");
+        mState = FileUtils.readFromFile("temp.txt");
+
+        setPhrase(mState.remove(0));
+        restoreFromState();
 
         //Si el intent viene con author, lo seteamos y tiramos todo
         //Si no, restoreamos sharedpreferences
@@ -251,4 +204,5 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         if (getIntent().hasExtra("phrase"))
             setPhrase(getIntent().getStringExtra("phrase"));
     }
+
 }
