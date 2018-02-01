@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     private EditText mPhrase;
     private boolean mRestoring;
     private Deque<ArrayList<String>> mHistory = new ArrayDeque<>();
-    private final static  String PATH = Environment.getExternalStorageDirectory() + "/crip";
+    public final static  String PATH = Environment.getExternalStorageDirectory() + "/crip";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
