@@ -48,6 +48,12 @@ public class PhraseActivity extends AppCompatActivity {
                 startActivity(new Intent(PhraseActivity.this, MainActivity.class));
             }
         });
+        findViewById(R.id.button_gotosolve).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(PhraseActivity.this, PrintActivity.class));
+            }
+        });
         ((TextView) findViewById(R.id.phrase)).addTextChangedListener(getTextWatcher());
         ((TextView) findViewById(R.id.title)).addTextChangedListener(getTextWatcher());
     }

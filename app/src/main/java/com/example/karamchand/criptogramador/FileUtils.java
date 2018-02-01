@@ -23,7 +23,7 @@ public class FileUtils {
     public static String saveWithTimeStamp(String id, String path, ArrayList<String> contents) {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(System.currentTimeMillis());
-        SimpleDateFormat format = new SimpleDateFormat("yy_MM_dd_hh_mm_ss");
+        SimpleDateFormat format = new SimpleDateFormat("yy_MM_dd_HH_mm_ss");
         String filename = id + "_" + format.format(c.getTime());
         save(path, filename, contents);
         return filename;
@@ -57,6 +57,7 @@ public class FileUtils {
                 .setTitle("Load file")
                 .setItems(mFileList, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
                         listener.onLoad(readFromFile(path, mFileList[which]));
                     }
                 })

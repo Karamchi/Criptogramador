@@ -22,8 +22,9 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private HashMap<Integer, Character> mLettersForPhrasePos;
 
     private ArrayList<ArrayList<Integer>> mLettersState = new ArrayList<>();
-    private ArrayList<Character> mPhraseState = new ArrayList<>();
+    private ArrayList<Character> mCellLetters = new ArrayList<>();
     private ArrayList<Integer> mCellNumbers = new ArrayList<>();
+    private HashMap<Integer, CellView> mCells;
 
     private String mPhraseAlpha;
     private LinearLayout mLayout;
@@ -33,13 +34,17 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_print);
-        mPhrase = PhraseActivity.toAlpha(getIntent().getStringExtra("phrase").toLowerCase(), true);
-        mPhraseAlpha = mPhrase.replace(" ", "");
-        mWords = (ArrayList<String>) getIntent().getExtras().get("words");
         mLayout = (LinearLayout) findViewById(R.id.activity_print_layout);
+        if (getIntent().hasExtra("words")) {
+            mPhrase = PhraseActivity.toAlpha(getIntent().getStringExtra("phrase").toLowerCase(), true);
+            mPhraseAlpha = mPhrase.replace(" ", "");
+            mWords = (ArrayList<String>) getIntent().getExtras().get("words");
 
-        generate();
-        restoreFromState();
+            generate();
+            restoreFromState();
+        } else {
+            load();
+        }
         setupToolbar();
     }
 
@@ -91,9 +96,9 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         int letterPosition = 0;
         for (int i = 0; i < mPhrase.length(); i++) {
             if (mPhrase.charAt(i) == ' ') {
-                mPhraseState.add(' ');
+                mCellLetters.add(' ');
             } else {
-                mPhraseState.add(mLettersForPhrasePos.get(letterPosition));
+                mCellLetters.add(mLettersForPhrasePos.get(letterPosition));
                 letterPosition++;
             }
             mCellNumbers.add(letterPosition);
@@ -102,18 +107,19 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     private void restoreFromState() {
+        mCells = new HashMap<>();
         mLastRow = new LinearLayout(this);
         for (ArrayList<Integer> word : mLettersState) {
             for (Integer i : word) {
-                addCell(' ', i);
+                addCell(' ', i + 1);
             }
             addRow();
         }
-        for (int i = 0; i<mPhraseState.size(); i++) {
-            if (mPhraseState.get(i) == ' ')
+        for (int i = 0; i< mCellLetters.size(); i++) {
+            if (mCellLetters.get(i) == ' ')
                 addBlackCell();
             else
-                addCell(mPhraseState.get(i), mCellNumbers.get(i));
+                addCell(mCellLetters.get(i), mCellNumbers.get(i));
             if (i % 20 == 19)
                 addRow();
         }
@@ -125,7 +131,12 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     private void addCell(char c, int i) {
-        mLastRow.addView(new CellView(this).with(c, i));
+        CellView v = new CellView(this).with(c, i);
+        if (mCells.containsKey(i))
+            v.setTwin(mCells.get(i));
+        else
+            mCells.put(i, v);
+        mLastRow.addView(v);
     }
 
     private void addBlackCell() {
@@ -142,9 +153,9 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             content.add("");
         }
         String word = "";
-        for (int i = 0; i < mPhraseState.size(); i++) {
-            word += Character.toString(mPhraseState.get(i)) + '\t';
-            if (mPhraseState.get(i) != ' ') {
+        for (int i = 0; i < mCellLetters.size(); i++) {
+            word += Character.toString(mCellLetters.get(i)) + '\t';
+            if (mCellLetters.get(i) != ' ') {
                 word += Integer.toString(mCellNumbers.get(i)) + '\t';
             } else {
                 word += " \t";
@@ -168,7 +179,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     @Override
     public void onLoad(ArrayList<String> contents) {
-        mPhraseState = new ArrayList<>();
+        mCellLetters = new ArrayList<>();
         mLettersState = new ArrayList<>();
         mLayout.removeAllViews();
         boolean readingWords = true;
@@ -186,9 +197,14 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 mLettersState.add(word);
             } else {
                 boolean odd = true;
-                for (char c : s.replace("\t", "").toCharArray()) {
+                for (String numberOrLetter : s.split("\t")) {
+                    if (numberOrLetter.equals("")) continue;
                     if (odd)
-                        mPhraseState.add(c);
+                        mCellLetters.add(numberOrLetter.charAt(0));
+                    else if (!numberOrLetter.equals(" "))
+                        mCellNumbers.add(Integer.parseInt(numberOrLetter));
+                    else
+                        mCellNumbers.add(0);
                     odd = !odd;
                 }
             }
