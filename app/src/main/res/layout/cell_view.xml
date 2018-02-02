@@ -31,13 +31,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
+        <TextView
             android:id="@+id/cell_view_input"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"
             android:textColor="@android:color/black"
-            android:digits="@string/alphabet"
             android:gravity="center"/>
 
         <TextView
@@ -46,6 +44,7 @@
             android:layout_height="match_parent"
             android:padding="2dp"
             android:maxLength="1"
+            android:textAllCaps="true"
             android:textColor="@android:color/black"
             android:layout_gravity="end"
             android:gravity="bottom"/>

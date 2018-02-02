@@ -1,11 +1,15 @@
 package com.example.karamchand.criptogramador;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -15,7 +19,7 @@ import java.util.HashMap;
 
 import static com.example.karamchand.criptogramador.LettersView.ALPHABET;
 
-public class PrintActivity extends AppCompatActivity implements FileUtils.LoadListener {
+public class PrintActivity extends AppCompatActivity implements FileUtils.LoadListener, CellView.CellListener {
 
     private static final String PATH = "/finished";
     private static final int ROW_WIDTH = 10;
@@ -31,6 +35,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private LinearLayout mLayout;
     private SolveWordView mLastRow;
     private CellView mLastAdded;
+    private EditText mEditText;
+    private CellView mCurrentInput;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,6 +50,25 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             load();
         }
         setupToolbar();
+        mEditText = ((EditText) findViewById(R.id.print_activity_edit_text));
+        mEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) {
+                    mCurrentInput.setInput(s.toString());
+                    mCurrentInput.mTwin.setInput(s.toString());
+                    if (mCurrentInput.mNext != null)
+                        mCurrentInput.mNext.requestCursor();
+                    mEditText.setText("");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     private void setupToolbar() {
@@ -143,11 +168,12 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 mLastRow = new SolveWordView(this);
             }
         }
+        mCells.get(1).requestCursor();
         mLayout.addView(mLastRow);
     }
 
     private void addCell(char c, int i) {
-        CellView v = new CellView(this).with(c, i);
+        CellView v = new CellView(this).with(c, i).withListener(this);
         if (mPunctuation.containsKey(i) && c != ' ') {
             v.setPunctuation(mPunctuation.get(i));
         }
@@ -269,9 +295,29 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        View v = getCurrentFocus();
-        if (v != null) v.onKeyDown(keyCode, event);
+        if (keyCode == KeyEvent.KEYCODE_DEL) {
+            mCurrentInput.setInput("");
+            mCurrentInput.mTwin.setInput("");
+            if (mCurrentInput.mPrevious != null)
+                mCurrentInput.mPrevious.requestCursor();
+            return true;
+        }
         return super.onKeyDown(keyCode, event);
     }
 
+    @Override
+    public void onFocusRequested(CellView cellView, float x, float y) {
+        mEditText.setX(x);
+        mEditText.setY(y);
+
+        if (mCurrentInput != null)
+            mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
+        cellView.setBackgroundColor(Color.BLUE);
+        mCurrentInput = cellView;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v instanceof CellView) ((CellView) v).requestCursor();
+    }
 }
