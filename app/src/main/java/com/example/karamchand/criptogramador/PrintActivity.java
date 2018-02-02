@@ -3,6 +3,7 @@ package com.example.karamchand.criptogramador;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -28,7 +29,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private HashMap<Integer, Character> mPunctuation;
 
     private LinearLayout mLayout;
-    private LinearLayout mLastRow;
+    private SolveWordView mLastRow;
     private CellView mLastAdded;
 
     @Override
@@ -86,7 +87,6 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             }
         }
 
-        mLastRow = new LinearLayout(this);
         for (int i = 0; i< mWords.size(); i++) {
             String word = mWords.get(i);
             for (char c : word.toCharArray()) {
@@ -111,27 +111,26 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     private void restoreFromState() {
         mCells = new HashMap<>();
-        mLastRow = new LinearLayout(this);
-        for (ArrayList<Integer> word : mLettersState) {
-            for (Integer i : word) {
+        for (int word = 0; word < mLettersState.size(); word++) {
+            mLastRow = new SolveWordView(this)
+                    .withLetter((ALPHABET.toUpperCase() + ALPHABET).charAt(word));
+            for (Integer i : mLettersState.get(word)) {
                 addCell(' ', i + 1);
             }
-            addRow();
+            mLayout.addView(mLastRow);
         }
+        mLastRow = new SolveWordView(this);
         for (int i = 0; i < mCellLetters.size(); i++) {
             if (mCellLetters.get(i) == ' ')
                 addBlackCell();
             else
                 addCell(mCellLetters.get(i), mCellNumbers.get(i));
-            if ((i + 1) % ROW_WIDTH == 0)
-                addRow();
+            if ((i + 1) % ROW_WIDTH == 0) {
+                mLayout.addView(mLastRow);
+                mLastRow = new SolveWordView(this);
+            }
         }
-        addRow();
-    }
-
-    private void addRow() {
         mLayout.addView(mLastRow);
-        mLastRow = new LinearLayout(this);
     }
 
     private void addCell(char c, int i) {
@@ -201,7 +200,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                     if (!number.equals(""))
                         word.add(Integer.parseInt(number));
                 }
-                mLettersState.add(word);
+                if (word.size() > 0)
+                    mLettersState.add(word);
             } else {
                 boolean odd = true;
                 for (String numberOrLetter : s.split("\t")) {
@@ -221,7 +221,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         View v = getCurrentFocus();
-        v.onKeyDown(keyCode, event);
+        if (v != null) v.onKeyDown(keyCode, event);
         return super.onKeyDown(keyCode, event);
     }
 

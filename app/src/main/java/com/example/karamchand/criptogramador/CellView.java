@@ -45,9 +45,7 @@ public class CellView extends LinearLayout {
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
             public void afterTextChanged(Editable editable) {
@@ -131,5 +129,9 @@ public class CellView extends LinearLayout {
     @Override
     public boolean isFocused() {
         return mInput.isFocused();
+    }
+
+    public void setPunctuation(char c) {
+        ((TextView) findViewById(R.id.cell_view_punctuation)).setText(Character.toString(c));
     }
 }

@@ -83,4 +83,21 @@ public class FileUtils {
     public interface LoadListener {
         void onLoad(ArrayList<String> s, String filename);
     }
+
+    public static void copyFile(File src, File dst) {
+        try {
+            FileInputStream fInStream = new FileInputStream(src);
+            FileOutputStream fOutStream = new FileOutputStream(dst);
+            byte[] buffer = new byte[1024];
+
+            int inputSize;
+            while ((inputSize = fInStream.read(buffer)) > 0)
+                fOutStream.write(buffer, 0, inputSize);
+
+            fInStream.close();
+            fOutStream.close();
+        } catch (Exception e) {
+
+        }
+    }
 }

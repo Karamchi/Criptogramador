@@ -1,5 +1,7 @@
 package com.example.karamchand.criptogramador;
 
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,20 +9,23 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class SearchAdapter extends RecyclerView.Adapter {
     private final ArrayList<String> mCorpus;
     private final ArrayList<String> mAlphaCorpus;
     private ArrayList<String> mFilteredCorpus;
     private ArrayList<String> mFilters;
+    private ArrayList<Integer> mConsonants = new ArrayList<>();
 
-    public SearchAdapter(ArrayList<String> mCorpus, ArrayList<String> mAlphaCorpus) {
+    public SearchAdapter(ArrayList<String> mCorpus, final ArrayList<String> mAlphaCorpus) {
         this.mCorpus = mCorpus;
         this.mAlphaCorpus = mAlphaCorpus;
         mFilteredCorpus = (ArrayList<String>) this.mCorpus.clone();
         mFilteredCorpus.add(0, Integer.toString(mFilteredCorpus.size()));
         mFilters = new ArrayList<>();
         for (int i = 0; i < 6; i++) mFilters.add("");
+        new ConsonantsTask().execute();
     }
 
     @Override
@@ -47,7 +52,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
     private void updateFilter() {
         mFilteredCorpus = new ArrayList<>();
         for (int i = 0; i < mCorpus.size(); i++) {
-            if (fitsfilters(mAlphaCorpus.get(i), mFilters)) {
+            if (fitsfilters(i, mFilters)) {
                 mFilteredCorpus.add(mCorpus.get(i));
             }
         }
@@ -55,7 +60,8 @@ public class SearchAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
-    private boolean fitsfilters(String string, ArrayList<String> mFilters) {
+    private boolean fitsfilters(int stringIndex, ArrayList<String> mFilters) {
+        String string = mAlphaCorpus.get(stringIndex);
         String starts = mFilters.get(SearchActivity.STARTS);
         if (!(starts.length() == 0) && !starts.contains(Character.toString(string.charAt(0))))
             return false;
@@ -71,9 +77,15 @@ public class SearchAdapter extends RecyclerView.Adapter {
         if (!(letters.length() == 0) && !(Integer.parseInt(letters) == string.length()))
             return false;
         String consonants = mFilters.get(SearchActivity.CONSONANTS);
-        if (!(consonants.length() == 0) &&
-                !(Integer.parseInt(consonants) <= substring.replaceAll("a|e|i|o|u", "").length()))
+        if (mConsonants.size() > stringIndex) {
+            if (!(consonants.length() == 0) &&
+                    !(Integer.parseInt(consonants) <= mConsonants.get(stringIndex)))
             return false;
+        } else {
+            if (!(consonants.length() == 0) &&
+                    !(Integer.parseInt(consonants) <= substring.replaceAll("a|e|i|o|u", "").length()))
+            return false;
+        }
         return true;
     }
 
@@ -105,7 +117,18 @@ public class SearchAdapter extends RecyclerView.Adapter {
         }
 
         public void setItem(String s) {
-            ((TextView)view.findViewById(R.id.view_holder)).setText(s);
+            ((TextView) view.findViewById(R.id.view_holder)).setText(s);
+        }
+    }
+
+    public class ConsonantsTask extends AsyncTask {
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            for (int i = 0; i < mAlphaCorpus.size(); i++) {
+                mConsonants.add(mAlphaCorpus.get(i).substring(1).replaceAll("a|e|i|o|u", "").length());
+            }
+            return null;
         }
     }
 }
