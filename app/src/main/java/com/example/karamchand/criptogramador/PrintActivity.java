@@ -26,7 +26,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private ArrayList<Character> mCellLetters = new ArrayList<>();
     private ArrayList<Integer> mCellNumbers = new ArrayList<>();
     private HashMap<Integer, CellView> mCells;
-    private HashMap<Integer, Character> mPunctuation;
+    private HashMap<Integer, Character> mPunctuation = new HashMap<>();
 
     private LinearLayout mLayout;
     private SolveWordView mLastRow;
@@ -62,7 +62,9 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     public void generate() {
-        mPhrase = PhraseActivity.toAlpha(getIntent().getStringExtra("phrase").toLowerCase(), true);
+        String phrase = getIntent().getStringExtra("phrase").toLowerCase();
+        buildPunctuation(phrase);
+        mPhrase = PhraseActivity.toAlpha(phrase, true);
         mFileId = mPhrase.subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_");
         String mPhraseAlpha = mPhrase.replace(" ", "");
         ArrayList<String> mWords = (ArrayList<String>) getIntent().getExtras().get("words");
@@ -109,6 +111,17 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     }
 
+    private void buildPunctuation(String phrase) {
+        int letterCount = 0;
+        for (int i = 0; i < phrase.length(); i++) {
+            if ((ALPHABET + "áéíóúû").contains(Character.toString(phrase.charAt(i)))) {
+                letterCount++;
+            } else if (phrase.charAt(i) != ' '){
+                mPunctuation.put(letterCount, phrase.charAt(i));
+            }
+        }
+    }
+
     private void restoreFromState() {
         mCells = new HashMap<>();
         for (int word = 0; word < mLettersState.size(); word++) {
@@ -135,6 +148,9 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     private void addCell(char c, int i) {
         CellView v = new CellView(this).with(c, i);
+        if (mPunctuation.containsKey(i) && c != ' ') {
+            v.setPunctuation(mPunctuation.get(i));
+        }
         if (mCells.containsKey(i))
             v.setTwin(mCells.get(i));
         else
@@ -154,10 +170,23 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         for (ArrayList<Integer> wordState : mLettersState) {
             String word = "";
             for (Integer cell : wordState)
-                word += " \t" + Integer.toString(cell) + "\t";
+                word += " \t" + Integer.toString(cell + 1) + "\t";
             content.add(word);
             content.add("");
         }
+        ArrayList<String> phraseDump = dumpPhrase();
+        ArrayList<String> inputDump = dumpInput();
+        for (int i = 0; i<phraseDump.size(); i++) {
+            content.add(phraseDump.get(i));
+            content.add(inputDump.get(i));
+        }
+
+        String filename = FileUtils.saveWithTimeStamp(mFileId, PATH, content);
+        Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
+    }
+
+    public ArrayList<String> dumpPhrase() {
+        ArrayList<String> result = new ArrayList<>();
         String word = "";
         for (int i = 0; i < mCellLetters.size(); i++) {
             word += Character.toString(mCellLetters.get(i)) + '\t';
@@ -167,15 +196,35 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 word += " \t";
             }
             if ((i + 1) % ROW_WIDTH == 0) {
-                content.add(word);
-                content.add("");
+                result.add(word);
                 word = "";
             }
         }
-        content.add(word);
-        content.add("");
-        String filename = FileUtils.saveWithTimeStamp(mFileId, PATH, content);
-        Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
+        result.add(word);
+        return result;
+    }
+
+    public ArrayList<String> dumpInput() {
+        ArrayList<String> result = new ArrayList<>();
+        String word = "";
+        for (int j = 0; j < mCellLetters.size(); j++) {
+            int i = mCellNumbers.get(j);
+            String input = mCells.get(i).getInput();
+            if (input == null || input.equals(""))
+                input = " ";
+            word += input + '\t';
+            if (mPunctuation.containsKey(i)) {
+                word += Character.toString(mPunctuation.get(i)) + '\t';
+            } else {
+                word += " \t";
+            }
+            if ((j + 1) % ROW_WIDTH == 0) {
+                result.add(word);
+                word = "";
+            }
+        }
+        result.add(word);
+        return result;
     }
 
     private void load() {
