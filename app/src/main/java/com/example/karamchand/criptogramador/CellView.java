@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -80,7 +81,7 @@ public class CellView extends LinearLayout {
             layout = (LinearLayout) getParent().getParent();
         else
             layout = (LinearLayout) getParent();
-        mListener.onFocusRequested(this, getX(), layout.getY());
+        mListener.onFocusRequested(this, getX(), layout.getY() + ((FrameLayout) mInput.getParent()).getY());
     }
 
     public String getInput() {

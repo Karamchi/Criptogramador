@@ -312,7 +312,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
         if (mCurrentInput != null)
             mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
-        cellView.setBackgroundColor(Color.BLUE);
+        cellView.setBackgroundColor(Color.LTGRAY);
         mCurrentInput = cellView;
     }
 
