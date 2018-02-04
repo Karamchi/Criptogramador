@@ -42,7 +42,7 @@ public class RowView extends LinearLayout {
         if (percentage > 100) color = rgb(255, 0, 0);
         if (percentage < 90) color = rgb(255, 255, 0);
 
-        TextView percentageView = findViewById(R.id.percentage);
+        TextView percentageView = (TextView) findViewById(R.id.percentage);
 
         percentageView.setText(String.format("%d%%", percentage));
         percentageView.setBackgroundColor(color);

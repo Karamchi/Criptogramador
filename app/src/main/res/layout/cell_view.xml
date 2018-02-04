@@ -36,6 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textColor="@android:color/black"
+            android:textSize="18sp"
             android:gravity="center"/>
 
         <TextView
@@ -46,6 +47,7 @@
             android:maxLength="1"
             android:textAllCaps="true"
             android:textColor="@android:color/black"
+            android:textSize="18sp"
             android:layout_gravity="end"
             android:gravity="bottom"/>
 

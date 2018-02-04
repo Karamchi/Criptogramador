@@ -1,5 +1,6 @@
 package com.example.karamchand.criptogramador;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,12 +10,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 import static com.example.karamchand.criptogramador.LettersView.ALPHABET;
@@ -23,47 +26,60 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     private static final String PATH = "/finished";
     private static final int ROW_WIDTH = 10;
-    private String mPhrase;
     private String mFileId;
 
+    //The numbers that correspond to word i char j
     private ArrayList<ArrayList<Integer>> mLettersState = new ArrayList<>();
+    //The letter and number corresponding to cell i in the phrase (with spaces)
     private ArrayList<Character> mCellLetters = new ArrayList<>();
     private ArrayList<Integer> mCellNumbers = new ArrayList<>();
-    private HashMap<Integer, CellView> mCells;
+    //For every cell on the phrase, the input
+    private HashMap<Integer, Character> mInput = new HashMap<>();
+    //For every cell on the phrase with punctuation, the char for its number
     private HashMap<Integer, Character> mPunctuation = new HashMap<>();
+
+    //The cell view *on the letters* with this number
+    private HashMap<Integer, CellView> mCells;
 
     private LinearLayout mLayout;
     private SolveWordView mLastRow;
     private CellView mLastAdded;
     private EditText mEditText;
     private CellView mCurrentInput;
+    private boolean mFromUser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_print);
         mLayout = (LinearLayout) findViewById(R.id.activity_print_layout);
+        mEditText = ((EditText) findViewById(R.id.print_activity_edit_text));
         if (getIntent().hasExtra("words")) {
-            generate();
+            Generator g = new Generator(getIntent().getStringExtra("phrase"),
+                    (ArrayList<String>) getIntent().getExtras().get("words"));
+            g.generate();
+            mLettersState = g.mLettersState;
+            mCellLetters = g.mCellLetters;
+            mCellNumbers = g.mCellNumbers;
+            mPunctuation = g.mPunctuation;
+            mFileId = g.mFileId;
             restoreFromState();
         } else {
             load();
         }
         setupToolbar();
-        mEditText = ((EditText) findViewById(R.id.print_activity_edit_text));
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 0) {
-                    mCurrentInput.setInput(s.toString());
-                    mCurrentInput.mTwin.setInput(s.toString());
-                    if (mCurrentInput.mNext != null)
-                        mCurrentInput.mNext.requestCursor();
-                    mEditText.setText("");
+                if (!mFromUser) {
+                    mFromUser = true;
+                    return;
                 }
+                if (s.length() > 0)
+                    mCurrentInput.setInput(s.toString(), mEditText.getSelectionStart() > 1);
             }
 
             @Override
@@ -86,75 +102,14 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         });
     }
 
-    public void generate() {
-        String phrase = getIntent().getStringExtra("phrase").toLowerCase();
-        buildPunctuation(phrase);
-        mPhrase = PhraseActivity.toAlpha(phrase, true);
-        mFileId = mPhrase.subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_");
-        String mPhraseAlpha = mPhrase.replace(" ", "");
-        ArrayList<String> mWords = (ArrayList<String>) getIntent().getExtras().get("words");
-
-        HashMap<Character, ArrayList<Integer>> indexes = new HashMap<>();
-        HashMap<Integer, Character> lettersForPhrasePos = new HashMap<>();
-
-        for (int i = 0; i < mWords.size(); i++)
-            mLettersState.add(new ArrayList<Integer>());
-
-        for (int i = 0; i < mPhraseAlpha.length(); i++) {
-            char c = mPhraseAlpha.charAt(i);
-            if (indexes.containsKey(c)) {
-                ArrayList<Integer> oldArray = indexes.get(c);
-                oldArray.add(i);
-                Collections.shuffle(oldArray);
-                indexes.put(c, oldArray);
-            } else {
-                ArrayList<Integer> array = new ArrayList<>();
-                array.add(i);
-                indexes.put(c, array);
-            }
-        }
-
-        for (int i = 0; i< mWords.size(); i++) {
-            String word = mWords.get(i);
-            for (char c : word.toCharArray()) {
-                int index = indexes.get(c).remove(0);
-                mLettersState.get(i).add(index);
-                lettersForPhrasePos.put(index, ALPHABET.toUpperCase().charAt(mWords.indexOf(word)));
-            }
-        }
-
-        int letterPosition = 0;
-        for (int i = 0; i < mPhrase.length(); i++) {
-            if (mPhrase.charAt(i) == ' ') {
-                mCellLetters.add(' ');
-            } else {
-                mCellLetters.add(lettersForPhrasePos.get(letterPosition));
-                letterPosition++;
-            }
-            mCellNumbers.add(letterPosition);
-        }
-
-    }
-
-    private void buildPunctuation(String phrase) {
-        int letterCount = 0;
-        for (int i = 0; i < phrase.length(); i++) {
-            if ((ALPHABET + "áéíóúû").contains(Character.toString(phrase.charAt(i)))) {
-                letterCount++;
-            } else if (phrase.charAt(i) != ' '){
-                mPunctuation.put(letterCount, phrase.charAt(i));
-            }
-        }
-    }
-
     private void restoreFromState() {
+        mEditText.setVisibility(View.VISIBLE);
         mCells = new HashMap<>();
         for (int word = 0; word < mLettersState.size(); word++) {
             mLastRow = new SolveWordView(this)
                     .withLetter((ALPHABET.toUpperCase() + ALPHABET).charAt(word));
-            for (Integer i : mLettersState.get(word)) {
-                addCell(' ', i + 1);
-            }
+            for (Integer i : mLettersState.get(word))
+                addCell(' ', i);
             mLayout.addView(mLastRow);
         }
         mLastRow = new SolveWordView(this);
@@ -174,13 +129,15 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     private void addCell(char c, int i) {
         CellView v = new CellView(this).with(c, i).withListener(this);
-        if (mPunctuation.containsKey(i) && c != ' ') {
-            v.setPunctuation(mPunctuation.get(i));
-        }
-        if (mCells.containsKey(i))
+        if (mCells.containsKey(i)) {
             v.setTwin(mCells.get(i));
-        else
+            if (mInput.containsKey(i) && c != ' ')
+                v.setInput(Character.toString(mInput.get(i)), false);
+        } else {
             mCells.put(i, v);
+        }
+        if (mPunctuation.containsKey(i) && c != ' ')
+            v.setPunctuation(mPunctuation.get(i));
         mLastRow.addView(v);
         v.setPrevious(mLastAdded);
         if (mLastAdded != null) mLastAdded.setNext(v);
@@ -196,13 +153,13 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         for (ArrayList<Integer> wordState : mLettersState) {
             String word = "";
             for (Integer cell : wordState)
-                word += " \t" + Integer.toString(cell + 1) + "\t";
+                word += " \t" + Integer.toString(cell) + "\t";
             content.add(word);
             content.add("");
         }
         ArrayList<String> phraseDump = dumpPhrase();
         ArrayList<String> inputDump = dumpInput();
-        for (int i = 0; i<phraseDump.size(); i++) {
+        for (int i = 0; i < phraseDump.size(); i++) {
             content.add(phraseDump.get(i));
             content.add(inputDump.get(i));
         }
@@ -216,11 +173,10 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         String word = "";
         for (int i = 0; i < mCellLetters.size(); i++) {
             word += Character.toString(mCellLetters.get(i)) + '\t';
-            if (mCellLetters.get(i) != ' ') {
+            if (mCellLetters.get(i) != ' ')
                 word += Integer.toString(mCellNumbers.get(i)) + '\t';
-            } else {
+            else
                 word += " \t";
-            }
             if ((i + 1) % ROW_WIDTH == 0) {
                 result.add(word);
                 word = "";
@@ -235,15 +191,16 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         String word = "";
         for (int j = 0; j < mCellLetters.size(); j++) {
             int i = mCellNumbers.get(j);
-            String input = mCells.get(i).getInput();
+            String input = null;
+            if (mCells.containsKey(i))
+                input = mCells.get(i).getInput();
             if (input == null || input.equals(""))
                 input = " ";
             word += input + '\t';
-            if (mPunctuation.containsKey(i)) {
+            if (mPunctuation.containsKey(i))
                 word += Character.toString(mPunctuation.get(i)) + '\t';
-            } else {
+            else
                 word += " \t";
-            }
             if ((j + 1) % ROW_WIDTH == 0) {
                 result.add(word);
                 word = "";
@@ -264,13 +221,15 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         mLettersState = new ArrayList<>();
         mLayout.removeAllViews();
         boolean readingWords = true;
-        for (String s : contents) {
-            if (!s.isEmpty() && ALPHABET.toUpperCase().contains(Character.toString(s.charAt(0)))) {
+        for (int i = 0; i < contents.size(); i += 2) {
+            String topRow = contents.get(i);
+            String bottomRow = contents.get(i + 1);
+            if (!topRow.isEmpty() && ALPHABET.toUpperCase().contains(Character.toString(topRow.charAt(0)))) {
                 readingWords = false;
             }
             if (readingWords) {
                 ArrayList<Integer> word = new ArrayList<>();
-                for (String number : s.split("\t")) {
+                for (String number : topRow.split("\t")) {
                     number = number.replaceAll("[^0-9]", "");
                     if (!number.equals(""))
                         word.add(Integer.parseInt(number));
@@ -278,28 +237,35 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 if (word.size() > 0)
                     mLettersState.add(word);
             } else {
-                boolean odd = true;
-                for (String numberOrLetter : s.split("\t")) {
-                    if (numberOrLetter.equals("")) continue;
-                    if (odd)
-                        mCellLetters.add(numberOrLetter.charAt(0));
-                    else if (!numberOrLetter.equals(" "))
-                        mCellNumbers.add(Integer.parseInt(numberOrLetter));
-                    else
-                        mCellNumbers.add(0);
-                    odd = !odd;
-                }
+                loadPhraseLine(topRow.split("\t"), bottomRow.split("\t"));
             }
         }
         restoreFromState();
     }
 
+    private void loadPhraseLine(String[] topRow, String[] bottomRow) {
+        for (int i = 0; i < topRow.length; i += 2) {
+            mCellLetters.add(topRow[i].charAt(0));
+            int number = 0;
+            if (!topRow[i+1].equals(" "))
+                number = Integer.parseInt(topRow[i + 1]);
+            mCellNumbers.add(number);
+
+            mInput.put(number, string2Char(bottomRow[i]));
+            if (!bottomRow[i + 1].equals(" "))
+                mPunctuation.put(number, string2Char(bottomRow[i + 1]));
+        }
+    }
+
+    private char string2Char(String s) {
+        if (s.length() > 0) return s.charAt(0);
+        return ' ';
+    }
+
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_DEL) {
-            mCurrentInput.setInput("");
-            mCurrentInput.mTwin.setInput("");
-            if (mCurrentInput.mPrevious != null)
-                mCurrentInput.mPrevious.requestCursor();
+            mCurrentInput.setInput("", false);
+            mEditText.setSelection(Math.min(mEditText.length(), 1));
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -307,17 +273,25 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     @Override
     public void onFocusRequested(CellView cellView, float x, float y) {
-        mEditText.setX(x);
-        mEditText.setY(y);
+        ((FrameLayout) mEditText.getParent()).setX(x);
+        ((FrameLayout) mEditText.getParent()).setY(y);
 
-        if (mCurrentInput != null)
+        if (mCurrentInput != null) {
             mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
+            mCurrentInput.showInput(true);
+        }
         cellView.setBackgroundColor(Color.LTGRAY);
+        mFromUser = false;
+        mEditText.setText(cellView.getInput());
+        cellView.showInput(false);
         mCurrentInput = cellView;
     }
 
     @Override
     public void onClick(View v) {
-        if (v instanceof CellView) ((CellView) v).requestCursor();
+        if (v instanceof CellView) {
+//            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(v, 0);
+            ((CellView) v).requestCursor();
+        }
     }
 }

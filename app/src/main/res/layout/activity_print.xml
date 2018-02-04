@@ -46,28 +46,34 @@
             android:layout_height="wrap_content">
 
             <FrameLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent">
 
                 <LinearLayout
                     android:id="@+id/activity_print_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"/>
 
-                </LinearLayout>
+                <FrameLayout
+                    android:layout_width="45dp"
+                    android:layout_height="wrap_content">
 
-                <EditText
-                    android:id="@+id/print_activity_edit_text"
-                    android:layout_width="20dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
-                    android:cursorVisible="false"
-                    android:digits="@string/alphabet"
-                    android:background="@android:color/transparent"/>
+                    <EditText
+                        android:id="@+id/print_activity_edit_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:paddingLeft="2dp"
+                        android:paddingRight="2dp"
+                        android:textColor="@android:color/black"
+                        android:cursorVisible="true"
+                        android:digits="@string/alphabet"
+                        android:background="@android:color/transparent"/>
+
+                    </FrameLayout>
 
             </FrameLayout>
-
 
         </HorizontalScrollView>
 

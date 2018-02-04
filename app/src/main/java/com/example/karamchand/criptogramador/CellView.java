@@ -11,9 +11,9 @@ import android.widget.TextView;
 
 public class CellView extends LinearLayout {
     private TextView mInput;
-    protected CellView mTwin;
-    protected CellView mPrevious;
-    protected CellView mNext;
+    private CellView mTwin;
+    private CellView mPrevious;
+    private CellView mNext;
     private CellListener mListener;
 
     public CellView(Context context) {
@@ -62,8 +62,29 @@ public class CellView extends LinearLayout {
         }
     }
 
-    public void setInput(String input) {
-        mInput.setText(input.toUpperCase());
+    public void setInput(String input, boolean overwriteNext) {
+        input = input.toUpperCase();
+        if (input.length() == 0) {
+            mInput.setText("");
+            if (mPrevious != null)
+                mPrevious.requestCursor();
+        } else {
+            mInput.setText(input.substring(0, 1));
+            mTwin.setInputFromTwin(input.substring(0, 1));
+            if (input.length() == 2 && overwriteNext)
+                mNext.setInput(input.substring(1, 2), false);
+            if (mNext != null)
+                mNext.requestCursor();
+        }
+
+    }
+
+    public void setInputFromTwin(String input) {
+        mInput.setText(input);
+    }
+
+    public void showInput(boolean show) {
+        mInput.setVisibility(show ? VISIBLE : INVISIBLE);
     }
 
     public void setPrevious(CellView previous) {
