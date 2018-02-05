@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -40,21 +42,21 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private HashMap<Integer, Character> mPunctuation = new HashMap<>();
 
     //The cell view *on the letters* with this number
-    private HashMap<Integer, CellView> mCells;
+    private HashMap<Integer, CellData> mCells;
 
-    private LinearLayout mLayout;
-    private SolveWordView mLastRow;
-    private CellView mLastAdded;
+    private RecyclerView mRecycler;
+    private ArrayList<CellData> mLastRow;
     private EditText mEditText;
     private CellView mCurrentInput;
     private boolean mFromUser;
     private int mSolution;
+    private PrintAdapter mAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_print);
-        mLayout = (LinearLayout) findViewById(R.id.activity_print_layout);
+        mRecycler = (RecyclerView) findViewById(R.id.activity_print_layout);
         mEditText = ((EditText) findViewById(R.id.print_activity_edit_text));
         if (getIntent().hasExtra("words")) {
             Generator g = new Generator(getIntent().getStringExtra("phrase"),
@@ -111,34 +113,34 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     private void restoreFromState() {
         findViewById(R.id.save).setVisibility(View.VISIBLE);
-        mLastAdded = null;
+//        mLastAdded = null;
         mEditText.setVisibility(View.GONE);
+        mAdapter = new PrintAdapter(this);
         mCells = new HashMap<>();
         for (int word = 0; word < mLettersState.size(); word++) {
-            mLastRow = new SolveWordView(this)
-                    .withLetter((ALPHABET.toUpperCase() + ALPHABET).charAt(word));
+            mLastRow = new ArrayList<>();
+//                    .withLetter((ALPHABET.toUpperCase() + ALPHABET).charAt(word));
             for (Integer i : mLettersState.get(word))
                 addCell(' ', i);
-            mLayout.addView(mLastRow);
+            mAdapter.add(mLastRow);
         }
-        mLastRow = new SolveWordView(this);
 //        mLayout.invalidate();
+        mLastRow = new ArrayList<>();
         for (int i = 0; i < mCellLetters.size(); i++) {
             if (mCellLetters.get(i) == ' ')
                 addBlackCell();
             else
                 addCell(mCellLetters.get(i), mCellNumbers.get(i));
             if ((i + 1) % ROW_WIDTH == 0) {
-                mLayout.addView(mLastRow);
-                mLastRow = new SolveWordView(this);
+                mAdapter.add(mLastRow);
+                mLastRow = new ArrayList<>();
             }
         }
-        mLastAdded.setNext(mLastAdded);
-        mLayout.addView(mLastRow);
+        mAdapter.add(mLastRow);
     }
 
     private void addCell(char c, int i) {
-        CellView v = new CellView(this).with(c, i).withListener(this);
+        CellData v = new CellData(c, i);//.withListener(this);
         if (mCells.containsKey(i)) {
             v.setTwin(mCells.get(i));
             if (mInput.containsKey(i) && c != ' ')
@@ -148,14 +150,11 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         }
         if (mPunctuation.containsKey(i) && c != ' ')
             v.setPunctuation(mPunctuation.get(i));
-        mLastRow.addView(v);
-        v.setPrevious(mLastAdded);
-        if (mLastAdded != null) mLastAdded.setNext(v);
-        mLastAdded = v;
+        mLastRow.add(v);
     }
 
     private void addBlackCell() {
-        mLastRow.addView(new CellView(this).black());
+        mLastRow.add(new CellData());
     }
 
     private void save(boolean useTimestamp) {
@@ -209,7 +208,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             int i = mCellNumbers.get(j);
             String input = null;
             if (mCells.containsKey(i))
-                input = mCells.get(i).getInput();
+                input = Character.toString(mCells.get(i).input);
             if (input == null || input.equals(""))
                 input = " ";
             word += input + '\t';
@@ -239,7 +238,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         mCellLetters = new ArrayList<>();
         mLettersState = new ArrayList<>();
         mPunctuation = new HashMap<>();
-        mLayout.removeAllViews();
+        mRecycler.removeAllViews();
         boolean readingWords = true;
         int i;
         for (i = 0; i < contents.size() - 1; i += 2) {
