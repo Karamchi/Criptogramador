@@ -63,18 +63,20 @@ public class CellView extends LinearLayout {
     }
 
     public void setInput(String input, boolean overwriteNext) {
-        input = input.toUpperCase();
+        input = input.toUpperCase().replace(" ", "");
         if (input.length() == 0) {
             mInput.setText("");
+            mTwin.setInputFromTwin("");
             if (mPrevious != null)
                 mPrevious.requestCursor();
         } else {
             mInput.setText(input.substring(0, 1));
             mTwin.setInputFromTwin(input.substring(0, 1));
-            if (input.length() == 2 && overwriteNext)
-                mNext.setInput(input.substring(1, 2), false);
-            if (mNext != null)
+            if (mNext != null) {
+                if (input.length() == 2 && overwriteNext)
+                    mNext.setInput(input.substring(1, 2), false);
                 mNext.requestCursor();
+            }
         }
 
     }

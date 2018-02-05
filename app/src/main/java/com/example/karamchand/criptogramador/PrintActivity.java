@@ -10,7 +10,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -47,6 +46,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private EditText mEditText;
     private CellView mCurrentInput;
     private boolean mFromUser;
+    private int mSolution;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,6 +63,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             mCellNumbers = g.mCellNumbers;
             mPunctuation = g.mPunctuation;
             mFileId = g.mFileId;
+            mSolution = g.mSolution;
             restoreFromState();
         } else {
             load();
@@ -78,8 +79,11 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                     mFromUser = true;
                     return;
                 }
-                if (s.length() > 0)
-                    mCurrentInput.setInput(s.toString(), mEditText.getSelectionStart() > 1);
+                if (s.length() > 0) {
+                    boolean b = mEditText.getSelectionStart() > 1;
+                    mCurrentInput.setInput(s.toString(), b);
+                    if (b) mEditText.setSelection(Math.min(mEditText.length(), 1));
+                } checkForSolution();
             }
 
             @Override
@@ -91,7 +95,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                save();
+                save(true);
             }
         });
         findViewById(R.id.load).setOnClickListener(new View.OnClickListener() {
@@ -103,7 +107,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     private void restoreFromState() {
-        mEditText.setVisibility(View.VISIBLE);
+        mLastAdded = null;
+        mEditText.setVisibility(View.GONE);
         mCells = new HashMap<>();
         for (int word = 0; word < mLettersState.size(); word++) {
             mLastRow = new SolveWordView(this)
@@ -113,6 +118,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             mLayout.addView(mLastRow);
         }
         mLastRow = new SolveWordView(this);
+//        mLayout.invalidate();
         for (int i = 0; i < mCellLetters.size(); i++) {
             if (mCellLetters.get(i) == ' ')
                 addBlackCell();
@@ -123,7 +129,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 mLastRow = new SolveWordView(this);
             }
         }
-        mCells.get(1).requestCursor();
+        mLastAdded.setNext(mLastAdded);
         mLayout.addView(mLastRow);
     }
 
@@ -148,7 +154,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         mLastRow.addView(new CellView(this).black());
     }
 
-    private void save() {
+    private void save(boolean useTimestamp) {
         ArrayList<String> content = new ArrayList<>();
         for (ArrayList<Integer> wordState : mLettersState) {
             String word = "";
@@ -163,9 +169,14 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             content.add(phraseDump.get(i));
             content.add(inputDump.get(i));
         }
+        content.add(Integer.toString(mSolution));
 
-        String filename = FileUtils.saveWithTimeStamp(mFileId, PATH, content);
-        Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
+        if (useTimestamp) {
+            String filename = FileUtils.saveWithTimeStamp(mFileId, PATH, content);
+            Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
+        } else {
+            FileUtils.save(PATH, "temp", content);
+        }
     }
 
     public ArrayList<String> dumpPhrase() {
@@ -221,7 +232,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         mLettersState = new ArrayList<>();
         mLayout.removeAllViews();
         boolean readingWords = true;
-        for (int i = 0; i < contents.size(); i += 2) {
+        for (int i = 0; i < contents.size() - 1; i += 2) {
             String topRow = contents.get(i);
             String bottomRow = contents.get(i + 1);
             if (!topRow.isEmpty() && ALPHABET.toUpperCase().contains(Character.toString(topRow.charAt(0)))) {
@@ -240,7 +251,10 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 loadPhraseLine(topRow.split("\t"), bottomRow.split("\t"));
             }
         }
+        mSolution = Integer.parseInt(contents.get(contents.size() - 1));
+        long t = System.currentTimeMillis();
         restoreFromState();
+        Log.e("Time to restore", Long.toString(System.currentTimeMillis() - t));
     }
 
     private void loadPhraseLine(String[] topRow, String[] bottomRow) {
@@ -271,6 +285,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         return super.onKeyDown(keyCode, event);
     }
 
+    //Podría evitar esto al restorear pero no cambia el tiempo.
     @Override
     public void onFocusRequested(CellView cellView, float x, float y) {
         ((FrameLayout) mEditText.getParent()).setX(x);
@@ -290,8 +305,30 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     @Override
     public void onClick(View v) {
         if (v instanceof CellView) {
-//            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(v, 0);
+            mEditText.setVisibility(View.VISIBLE);
+            mEditText.requestFocus();
+            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(mEditText, 0);
             ((CellView) v).requestCursor();
         }
     }
+
+    public void checkForSolution() {
+        String solution = "";
+        for (String line : dumpInput()) {
+            solution += line;
+        }
+        solution = solution.replaceAll("[^A-Z]", "").toLowerCase();
+        if (solution.hashCode() == mSolution) {
+//            findViewById(R.id.youwin).setVisibility(View.INVISIBLE);
+        } else {
+//            findViewById(R.id.youwin).setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        save(false);
+        super.onStop();
+    }
+
 }

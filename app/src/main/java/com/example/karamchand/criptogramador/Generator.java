@@ -13,6 +13,7 @@ public class Generator {
     public ArrayList<Integer> mCellNumbers = new ArrayList<>();
     public HashMap<Integer, Character> mPunctuation = new HashMap<>();
     public String mFileId;
+    public int mSolution;
 
     private HashMap<Character, ArrayList<Integer>> indexes = new HashMap<>();
     private HashMap<Integer, Character> lettersForPhrasePos = new HashMap<>();
@@ -36,6 +37,7 @@ public class Generator {
         buildWords();
         buildPhrase();
         mFileId =  mPhrase.subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_");
+        mSolution = mPhraseAlpha.hashCode();
     }
 
     private void buildPunctuation(String phrase) {
@@ -80,11 +82,12 @@ public class Generator {
         for (int i = 0; i < mPhrase.length(); i++) {
             if (mPhrase.charAt(i) == ' ') {
                 mCellLetters.add(' ');
+                mCellNumbers.add(0);
             } else {
                 mCellLetters.add(lettersForPhrasePos.get(letterPosition));
                 letterPosition++;
+                mCellNumbers.add(letterPosition);
             }
-            mCellNumbers.add(letterPosition);
         }
     }
 
