@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     private void save() {
         ArrayList<String> content = (ArrayList<String>) mState.clone();
         content.add(0, mPhrase.getText().toString());
-        String filename = FileUtils.saveWithTimeStamp(
+        String filename = FileUtils.saveWithTimeStamp(this,
                 mPhrase.getText().subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_"),
                 "",
                 content);
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     private void save(String filename) {
         ArrayList<String> content = (ArrayList<String>) mState.clone();
         content.add(0, mPhrase.getText().toString());
-        FileUtils.save("", filename, content);
+        FileUtils.save(this, "", filename, content);
     }
 
     private void setTitleAuthor(String s) {

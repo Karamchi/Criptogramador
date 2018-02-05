@@ -5,9 +5,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -79,11 +79,10 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                     mFromUser = true;
                     return;
                 }
-                if (s.length() > 0) {
-                    boolean b = mEditText.getSelectionStart() > 1;
-                    mCurrentInput.setInput(s.toString(), b);
-                    if (b) mEditText.setSelection(Math.min(mEditText.length(), 1));
-                } checkForSolution();
+                boolean b = mEditText.getSelectionStart() > 1;
+                mCurrentInput.setInput(s.toString(), b);
+                if (b || s.length() == 0) mEditText.setSelection(Math.min(mEditText.length(), 1));
+                checkForSolution();
             }
 
             @Override
@@ -172,10 +171,10 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         content.add(Integer.toString(mSolution));
 
         if (useTimestamp) {
-            String filename = FileUtils.saveWithTimeStamp(mFileId, PATH, content);
+            String filename = FileUtils.saveWithTimeStamp(this, mFileId, PATH, content);
             Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
         } else {
-            FileUtils.save(PATH, "temp", content);
+            FileUtils.save(this, PATH, "temp", content);
         }
     }
 
@@ -224,6 +223,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private void load() {
         FileUtils.load(this, this, PATH);
     }
+
+//    getPackageManager().checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this.getPackageName())
 
     @Override
     public void onLoad(ArrayList<String> contents, String filename) {
@@ -277,7 +278,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_DEL) {
+        if (keyCode == KeyEvent.KEYCODE_DEL && mEditText.getSelectionStart() == 0) {
             mCurrentInput.setInput("", false);
             mEditText.setSelection(Math.min(mEditText.length(), 1));
             return true;

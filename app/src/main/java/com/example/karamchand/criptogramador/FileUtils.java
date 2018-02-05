@@ -1,7 +1,10 @@
 package com.example.karamchand.criptogramador;
 
-import android.content.Context;
+import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 
@@ -20,16 +23,17 @@ public class FileUtils {
     public final static String ROOT = Environment.getExternalStorageDirectory() + "/crip";
 
     //Path must start with /
-    public static String saveWithTimeStamp(String id, String path, ArrayList<String> contents) {
+    public static String saveWithTimeStamp(Activity context, String id, String path, ArrayList<String> contents) {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(System.currentTimeMillis());
         SimpleDateFormat format = new SimpleDateFormat("yy_MM_dd_HH_mm_ss");
         String filename = id + "_" + format.format(c.getTime());
-        save(path, filename, contents);
+        save(context, path, filename, contents);
         return filename;
     }
 
-    public static void save(String path, String filename, ArrayList<String> contents) {
+    public static void save(Activity context, String path, String filename, ArrayList<String> contents) {
+        requestPermissions(context);
         File dir = new File(ROOT + path);
         dir.mkdirs();
         File file = new File(dir, filename + ".txt");
@@ -48,7 +52,8 @@ public class FileUtils {
         }
     }
 
-    public static void load(Context context, final LoadListener listener, final String path) {
+    public static void load(Activity context, final LoadListener listener, final String path) {
+        requestPermissions(context);
         final File dir = new File(ROOT + path);
         dir.mkdirs();
         final String[] mFileList = dir.list();
@@ -99,5 +104,12 @@ public class FileUtils {
         } catch (Exception e) {
 
         }
+    }
+
+    private static void requestPermissions(Activity context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            if (context.getPackageManager().checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, context.getPackageName())
+                    == PackageManager.PERMISSION_DENIED)
+                context.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1024);
     }
 }
