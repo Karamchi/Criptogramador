@@ -74,6 +74,10 @@ public class SolveWordView extends LinearLayout {
         } else {
             mDefinition.setVisibility(GONE);
         }
+        //Esto es horrible. La idea es que el cursor quede bien en y, pero como las posiciones nunca
+        //se pueden obtener actualizadas, la unica forma es poniéndolo "arriba" de la verga que
+        //cambio, incluso si lo estoy cerrando. Espero en algún momento poder arreglar esto.
+        getViewAt(0).performClick();
     }
 
     public void setDefinition(String s) {

@@ -325,7 +325,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     @Override
     public void onClick(View v) {
         if (v instanceof CellView) {
-            mEditText.setEnabled(true);
+//            mEditText.setEnabled(true);
             mEditText.setVisibility(View.VISIBLE);
             mEditText.requestFocus();
             ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(mEditText, 0);
@@ -352,12 +352,12 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     @Override
     public void onDefinitionShown(SolveWordView view) {
-        mEditText.setVisibility(View.GONE);
-        mEditText.setEnabled(false);
-        if (mCurrentInput != null) {
-            mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
-            mCurrentInput.showInput(true);
-        }
+//        mEditText.setVisibility(View.GONE);
+//        mEditText.setEnabled(false);
+//        if (mCurrentInput != null) {
+//            mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
+//            mCurrentInput.showInput(true);
+//        }
 //        mEditText.setInputType(InputType.TYPE_NULL);
 //        mFromUser = false;
     }

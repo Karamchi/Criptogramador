@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/solve_word_view_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/solve_word_view_letter"
-        android:layout_width="22dp"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:visibility="gone"
-        android:text="A"/>
+    <LinearLayout
+        android:id="@+id/solve_word_view_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/solve_word_view_letter"
+            android:layout_width="22dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone"
+            android:text="A"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/solve_word_view_definition"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:text="Definition">
-    </TextView>
+        android:text="Definition"/>
 
 </LinearLayout>

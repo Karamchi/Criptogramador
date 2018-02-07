@@ -100,8 +100,8 @@ public class CellView extends LinearLayout {
     //Esto es horrible
     public void requestCursor() {
         LinearLayout layout;
-        if (getParent().getParent() instanceof SolveWordView)
-            layout = (LinearLayout) getParent().getParent();
+        if (getParent().getParent().getParent() instanceof SolveWordView)
+            layout = (LinearLayout) getParent().getParent().getParent();
         else
             layout = (LinearLayout) getParent();
         mListener.onFocusRequested(this, getX(), layout.getY() + ((FrameLayout) mInput.getParent()).getY());
