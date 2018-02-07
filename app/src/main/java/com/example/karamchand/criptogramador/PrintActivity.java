@@ -14,6 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -229,8 +230,10 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     @Override
     public void onLoad(ArrayList<String> contents, String filename) {
         mFileId = filename.substring(0, 8);
+        ((TextView) findViewById(R.id.title)).setText(mFileId);
         mCellLetters = new ArrayList<>();
         mLettersState = new ArrayList<>();
+        mPunctuation = new HashMap<>();
         mLayout.removeAllViews();
         boolean readingWords = true;
         for (int i = 0; i < contents.size() - 1; i += 2) {
@@ -315,15 +318,13 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     public void checkForSolution() {
         String solution = "";
-        for (String line : dumpInput()) {
+        for (String line : dumpInput())
             solution += line;
-        }
         solution = solution.replaceAll("[^A-Z]", "").toLowerCase();
-        if (solution.hashCode() == mSolution) {
-//            findViewById(R.id.youwin).setVisibility(View.INVISIBLE);
-        } else {
-//            findViewById(R.id.youwin).setVisibility(View.GONE);
-        }
+        if (solution.hashCode() == mSolution)
+            ((TextView) findViewById(R.id.title)).setText("SOLVED");
+        else
+            ((TextView) findViewById(R.id.title)).setText(mFileId);
     }
 
     @Override

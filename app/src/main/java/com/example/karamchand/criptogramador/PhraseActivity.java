@@ -100,7 +100,8 @@ public class PhraseActivity extends AppCompatActivity {
 
     public void reset() {
         Intent intent = new Intent(PhraseActivity.this, MainActivity.class);
-        intent.putExtra("phrase", ((EditText) findViewById(R.id.phrase)).getText().toString());
+        String phrase = ((EditText) findViewById(R.id.phrase)).getText().toString();
+        intent.putExtra("phrase", phrase.replace("\n", ""));
         intent.putExtra("title", ((EditText) findViewById(R.id.title)).getText().toString());
         startActivity(intent);
     }
