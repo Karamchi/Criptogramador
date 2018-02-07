@@ -23,7 +23,7 @@ import java.util.HashMap;
 import static com.example.karamchand.criptogramador.LettersView.ALPHABET;
 
 public class PrintActivity extends AppCompatActivity implements FileUtils.LoadListener,
-        CellView.CellListener, SolveWordView.DefinitionShownListener {
+        CellView.CellListener {
 
     private static final String PATH = "/finished";
     private static final int ROW_WIDTH = 10;
@@ -117,8 +117,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         mCells = new HashMap<>();
         for (int word = 0; word < mLettersState.size(); word++) {
             mLastRow = new SolveWordView(this)
-                    .withLetter((ALPHABET.toUpperCase() + ALPHABET).charAt(word))
-                    .withListener(this);
+                    .withLetter((ALPHABET.toUpperCase() + ALPHABET).charAt(word));
             if (mDefinitions.size() > word)
                 mLastRow.setDefinition(mDefinitions.get(word));
             for (Integer i : mLettersState.get(word))
@@ -350,15 +349,4 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         super.onStop();
     }
 
-    @Override
-    public void onDefinitionShown(SolveWordView view) {
-//        mEditText.setVisibility(View.GONE);
-//        mEditText.setEnabled(false);
-//        if (mCurrentInput != null) {
-//            mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
-//            mCurrentInput.showInput(true);
-//        }
-//        mEditText.setInputType(InputType.TYPE_NULL);
-//        mFromUser = false;
-    }
 }

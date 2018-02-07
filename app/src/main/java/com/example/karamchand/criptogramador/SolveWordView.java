@@ -1,6 +1,8 @@
 package com.example.karamchand.criptogramador;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -12,8 +14,7 @@ import java.util.ArrayList;
 public class SolveWordView extends LinearLayout {
 
     private ArrayList<CellView> mChildren = new ArrayList<>();
-    private TextView mDefinition;
-    private DefinitionShownListener mListener;
+    private String mDefinition;
 
     public SolveWordView(Context context) {
         super(context);
@@ -67,30 +68,20 @@ public class SolveWordView extends LinearLayout {
     }
 
     public void toggleShowDefinition() {
-        if (mDefinition == null) return;
-        if (mDefinition.getVisibility() == GONE) {
-            mDefinition.setVisibility(VISIBLE);
-            if (mListener != null) mListener.onDefinitionShown(this);
-        } else {
-            mDefinition.setVisibility(GONE);
-        }
-        //Esto es horrible. La idea es que el cursor quede bien en y, pero como las posiciones nunca
-        //se pueden obtener actualizadas, la unica forma es poniéndolo "arriba" de la verga que
-        //cambio, incluso si lo estoy cerrando. Espero en algún momento poder arreglar esto.
-        getViewAt(0).performClick();
+        findViewById(R.id.solve_word_view_letter).setActivated(true);
+        new AlertDialog.Builder(getContext())
+                .setMessage(mDefinition)
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        findViewById(R.id.solve_word_view_letter).setActivated(false);
+                    }
+                })
+                .show();
     }
 
     public void setDefinition(String s) {
-        mDefinition = findViewById(R.id.solve_word_view_definition);
-        mDefinition.setText(s);
+        mDefinition = s;
     }
 
-    public SolveWordView withListener(DefinitionShownListener l) {
-        mListener = l;
-        return this;
-    }
-
-    public interface DefinitionShownListener {
-        void onDefinitionShown(SolveWordView view);
-    }
 }
