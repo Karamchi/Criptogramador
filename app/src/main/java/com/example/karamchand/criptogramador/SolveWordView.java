@@ -11,7 +11,9 @@ import java.util.ArrayList;
 
 public class SolveWordView extends LinearLayout {
 
-    private ArrayList<CellView> mChildren;
+    private ArrayList<CellView> mChildren = new ArrayList<>();
+    private TextView mDefinition;
+    private DefinitionShownListener mListener;
 
     public SolveWordView(Context context) {
         super(context);
@@ -36,6 +38,12 @@ public class SolveWordView extends LinearLayout {
         TextView letter = ((TextView) findViewById(R.id.solve_word_view_letter));
         letter.setVisibility(VISIBLE);
         letter.setText(Character.toString(c));
+        letter.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleShowDefinition();
+            }
+        });
         return this;
     }
 
@@ -54,6 +62,31 @@ public class SolveWordView extends LinearLayout {
     @Override
     public void addView(View child) {
         ((LinearLayout) findViewById(R.id.solve_word_view_layout)).addView(child);
+        if (child instanceof CellView)
+            mChildren.add((CellView) child);
     }
 
+    public void toggleShowDefinition() {
+        if (mDefinition == null) return;
+        if (mDefinition.getVisibility() == GONE) {
+            mDefinition.setVisibility(VISIBLE);
+            if (mListener != null) mListener.onDefinitionShown(this);
+        } else {
+            mDefinition.setVisibility(GONE);
+        }
+    }
+
+    public void setDefinition(String s) {
+        mDefinition = findViewById(R.id.solve_word_view_definition);
+        mDefinition.setText(s);
+    }
+
+    public SolveWordView withListener(DefinitionShownListener l) {
+        mListener = l;
+        return this;
+    }
+
+    public interface DefinitionShownListener {
+        void onDefinitionShown(SolveWordView view);
+    }
 }
