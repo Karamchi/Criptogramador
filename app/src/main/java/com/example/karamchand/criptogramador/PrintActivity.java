@@ -22,7 +22,8 @@ import java.util.HashMap;
 
 import static com.example.karamchand.criptogramador.LettersView.ALPHABET;
 
-public class PrintActivity extends AppCompatActivity implements FileUtils.LoadListener, CellView.CellListener {
+public class PrintActivity extends AppCompatActivity implements FileUtils.LoadListener,
+        CellView.CellListener, SolveWordView.DefinitionShownListener {
 
     private static final String PATH = "/finished";
     private static final int ROW_WIDTH = 10;
@@ -116,7 +117,10 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         mCells = new HashMap<>();
         for (int word = 0; word < mLettersState.size(); word++) {
             mLastRow = new SolveWordView(this)
-                    .withLetter((ALPHABET.toUpperCase() + ALPHABET).charAt(word));
+                    .withLetter((ALPHABET.toUpperCase() + ALPHABET).charAt(word))
+                    .withListener(this);
+            if (mDefinitions.size() > word)
+                mLastRow.setDefinition(mDefinitions.get(word));
             for (Integer i : mLettersState.get(word))
                 addCell(' ', i);
             mLayout.addView(mLastRow);
@@ -326,6 +330,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     @Override
     public void onClick(View v) {
         if (v instanceof CellView) {
+//            mEditText.setEnabled(true);
             mEditText.setVisibility(View.VISIBLE);
             mEditText.requestFocus();
             ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(mEditText, 0);
@@ -350,4 +355,15 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         super.onStop();
     }
 
+    @Override
+    public void onDefinitionShown(SolveWordView view) {
+//        mEditText.setVisibility(View.GONE);
+//        mEditText.setEnabled(false);
+//        if (mCurrentInput != null) {
+//            mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
+//            mCurrentInput.showInput(true);
+//        }
+//        mEditText.setInputType(InputType.TYPE_NULL);
+//        mFromUser = false;
+    }
 }
