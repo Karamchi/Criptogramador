@@ -81,6 +81,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                     mFromUser = true;
                     return;
                 }
+                if (before == 1 && count == 0 && android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M)
+                    return; // Api < 23 va a llamar a onkeydown
                 boolean b = mEditText.getSelectionStart() > 1;
                 mCurrentInput.setInput(s.toString(), b);
                 if (b || s.length() == 0) mEditText.setSelection(Math.min(mEditText.length(), 1));
@@ -261,7 +263,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             }
         }
         for (; i < contents.size(); i++) {
-            if (contents.get(i).replaceAll("[0-9]", "").length() > 0)
+            if (contents.get(i).replaceAll("[0-9-]", "").length() > 0)
                 mDefinitions.add(contents.get(i));
             else
                 mSolution = Integer.parseInt(contents.get(i));
@@ -330,7 +332,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         String solution = "";
         for (String line : dumpInput())
             solution += line;
-        solution = solution.replaceAll("[^A-Z]", "").toLowerCase();
+        solution = solution.replaceAll("[^A-ZÑ]", "").toLowerCase();
         if (solution.hashCode() == mSolution)
             ((TextView) findViewById(R.id.title)).setText("SOLVED");
         else

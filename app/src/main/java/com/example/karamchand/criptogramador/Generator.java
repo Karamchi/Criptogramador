@@ -72,7 +72,7 @@ public class Generator {
             for (char c : word.toCharArray()) {
                 int index = indexes.get(c).remove(0);
                 mLettersState.get(i).add(index + 1);
-                lettersForPhrasePos.put(index, ALPHABET.toUpperCase().charAt(mWords.indexOf(word)));
+                lettersForPhrasePos.put(index, (ALPHABET.toUpperCase() + ALPHABET).charAt(mWords.indexOf(word)));
             }
         }
     }
