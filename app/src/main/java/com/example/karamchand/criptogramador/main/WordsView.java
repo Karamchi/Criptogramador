@@ -92,6 +92,19 @@ public class WordsView extends LinearLayout {
         };
     }
 
+    public void setWords(ArrayList<String> state) {
+        removeAllViews();
+        mChildren = new ArrayList<>();
+        for (int i = 0; i < state.size(); i++) {
+            WordView newView = new WordView(getContext());
+            newView.addTextChangedListener(getTextWatcher(i));
+            newView.setOnFocusChangeListener(getOnFocusChangeListener(i));
+            newView.setText(state.get(i));
+            mChildren.add(newView);
+            addView(newView);
+        }
+    }
+
     public interface OnWordChangedListener {
         void onWordChanged(int index, String newWord);
 

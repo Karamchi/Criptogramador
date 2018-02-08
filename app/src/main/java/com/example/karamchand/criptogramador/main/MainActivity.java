@@ -160,9 +160,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
 
     public void restoreFromState() {
         mRestoring = true;
-        for (int i = 0; i < mState.size(); i++) {
-            mWordsView.setWord(i, mState.get(i));
-        }
+        mWordsView.setWords(mState);
         mRestoring = false;
         mLettersView.update(new Data(mState));
         mLettersView.setTotalWords(mState.size());
