@@ -14,6 +14,7 @@ public class PrintAdapter extends RecyclerView.Adapter {
 
     private final Context mContext;
     private ArrayList<ArrayList<CellData>> mDataset = new ArrayList<>();
+    private CellView.CellListener mCellListener;
 
     public PrintAdapter(Context context) {
         mContext = context;
@@ -45,22 +46,33 @@ public class PrintAdapter extends RecyclerView.Adapter {
         mDataset.add(mLastRow);
     }
 
+    public PrintAdapter withlistener(CellView.CellListener l) {
+        mCellListener = l;
+        return this;
+    }
+
     private class PrintViewholder extends RecyclerView.ViewHolder {
         public PrintViewholder(View v) {
             super(v);
         }
 
         public void setItem(ArrayList<CellData> cellDatas) {
+            ((ViewGroup) itemView).removeAllViews();
             CellView lastAdded = null;
             for (CellData cellData : cellDatas) {
-                CellView view = new CellView(mContext).with(cellData.letter, cellData.number);
+                CellView view;
+                if (cellData.number == 0)
+                    view = new CellView(mContext).black();
+                else
+                    view = new CellView(mContext).with(cellData.letter, cellData.number)
+                            .withListener(mCellListener);
                 view.setPunctuation(cellData.punctuation);
                 if (lastAdded != null) {
                     view.setPrevious(lastAdded);
                     lastAdded.setNext(view);
                 }
                 lastAdded = view;
-                ((LinearLayout) view.findViewById(R.id.solve_word_view_layout)).addView(view);
+                ((LinearLayout) itemView.findViewById(R.id.solve_word_view_layout)).addView(view);
             }
         }
 

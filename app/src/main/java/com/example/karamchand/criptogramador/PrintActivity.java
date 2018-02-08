@@ -116,7 +116,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         findViewById(R.id.save).setVisibility(View.VISIBLE);
 //        mLastAdded = null;
         mEditText.setVisibility(View.GONE);
-        mAdapter = new PrintAdapter(this);
+        mAdapter = new PrintAdapter(this).withlistener(this);
         mCells = new HashMap<>();
         for (int word = 0; word < mLettersState.size(); word++) {
             mLastRow = new ArrayList<>();
@@ -144,7 +144,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     private void addCell(char c, int i) {
-        CellData v = new CellData(c, i);//.withListener(this);
+        CellData v = new CellData(c, i);
         if (mCells.containsKey(i)) {
             v.setTwin(mCells.get(i));
             if (mInput.containsKey(i) && c != ' ')

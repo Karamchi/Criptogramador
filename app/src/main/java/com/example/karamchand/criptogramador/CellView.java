@@ -49,7 +49,7 @@ public class CellView extends LinearLayout {
         return this;
     }
 
-    public View black() {
+    public CellView black() {
         mInput.setVisibility(GONE);
         setBackgroundColor(Color.BLACK);
         return this;
@@ -66,7 +66,7 @@ public class CellView extends LinearLayout {
         input = input.toUpperCase().replace(" ", "");
         if (input.length() == 0) {
             mInput.setText("");
-            mTwin.setInputFromTwin("");
+//            mTwin.setInputFromTwin("");
             if (mPrevious != null)
                 mPrevious.requestCursor();
         } else {
