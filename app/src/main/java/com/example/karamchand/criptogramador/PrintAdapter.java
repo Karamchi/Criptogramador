@@ -9,12 +9,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PrintAdapter extends RecyclerView.Adapter {
 
     private final Context mContext;
     private ArrayList<ArrayList<CellData>> mDataset = new ArrayList<>();
     private CellView.CellListener mCellListener;
+    private int mLettersLength;
+
+    private HashMap<Integer, Character> mAdapterInput;
+    private HashMap<Integer, CellView> mAdapterCells;
 
     public PrintAdapter(Context context) {
         mContext = context;
@@ -28,12 +33,17 @@ public class PrintAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        PrintViewholder vh = (PrintViewholder) holder;
+        if (position < mLettersLength)
+            vh.setLetter((LettersView.ALPHABET.toUpperCase() + LettersView.ALPHABET).charAt(position));
+        else
+            vh.setLetter(null);
         ((PrintViewholder) holder).setItem(mDataset.get(position));
         if (position > 0) {
-            ((PrintViewholder) holder).setPrevious(mDataset.get(position - 1));
+            vh.setPrevious(mDataset.get(position - 1));
         }
         if (position < mDataset.size() - 1) {
-            ((PrintViewholder) holder).setNext(mDataset.get(position + 1));
+            vh.setNext(mDataset.get(position + 1));
         }
     }
 
@@ -51,13 +61,24 @@ public class PrintAdapter extends RecyclerView.Adapter {
         return this;
     }
 
+    public void setLettersLength(int length) {
+        mLettersLength = length;
+    }
+
     private class PrintViewholder extends RecyclerView.ViewHolder {
+        private final LinearLayout mLayout;
+        private TextView textView;
+
         public PrintViewholder(View v) {
             super(v);
+            mLayout = (LinearLayout) itemView.findViewById(R.id.solve_word_view_layout);
+            textView = (TextView) itemView.findViewById(R.id.solve_word_view_letter);
+            textView.setVisibility(View.GONE);
         }
 
         public void setItem(ArrayList<CellData> cellDatas) {
-            ((ViewGroup) itemView).removeAllViews();
+            mLayout.removeAllViews();
+            mLayout.addView(textView);
             CellView lastAdded = null;
             for (CellData cellData : cellDatas) {
                 CellView view;
@@ -72,7 +93,7 @@ public class PrintAdapter extends RecyclerView.Adapter {
                     lastAdded.setNext(view);
                 }
                 lastAdded = view;
-                ((LinearLayout) itemView.findViewById(R.id.solve_word_view_layout)).addView(view);
+                mLayout.addView(view);
             }
         }
 
@@ -81,6 +102,16 @@ public class PrintAdapter extends RecyclerView.Adapter {
         }
 
         public void setPrevious(ArrayList<CellData> cellDatas) {
+
+        }
+
+        public void setLetter(Character c) {
+            if (c == null) {
+                textView.setVisibility(View.GONE);
+            } else {
+                textView.setVisibility(View.VISIBLE);
+                textView.setText(c.toString());
+            }
 
         }
     }

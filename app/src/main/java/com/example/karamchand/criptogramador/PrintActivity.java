@@ -117,15 +117,14 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 //        mLastAdded = null;
         mEditText.setVisibility(View.GONE);
         mAdapter = new PrintAdapter(this).withlistener(this);
+        mAdapter.setLettersLength(mLettersState.size());
         mCells = new HashMap<>();
-        for (int word = 0; word < mLettersState.size(); word++) {
+        for (ArrayList<Integer> word : mLettersState) {
             mLastRow = new ArrayList<>();
-//                    .withLetter((ALPHABET.toUpperCase() + ALPHABET).charAt(word));
-            for (Integer i : mLettersState.get(word))
+            for (Integer i : word)
                 addCell(' ', i);
             mAdapter.add(mLastRow);
         }
-//        mLayout.invalidate();
         mLastRow = new ArrayList<>();
         for (int i = 0; i < mCellLetters.size(); i++) {
             if (mCellLetters.get(i) == ' ')
