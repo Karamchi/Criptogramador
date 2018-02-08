@@ -43,6 +43,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     //The cell view *on the letters* with this number
     private HashMap<Integer, CellView> mCells;
 
+    private ArrayList<SolveWordView> mSolveWordViews= new ArrayList<>();
+
     private LinearLayout mLayout;
     private SolveWordView mLastRow;
     private CellView mLastAdded;
@@ -124,7 +126,9 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             for (Integer i : mLettersState.get(word))
                 addCell(' ', i);
             mLayout.addView(mLastRow);
+            mSolveWordViews.add(mLastRow);
         }
+        mLastAdded = null;
         mLastRow = new SolveWordView(this);
 //        mLayout.invalidate();
         for (int i = 0; i < mCellLetters.size(); i++) {
@@ -351,14 +355,14 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     @Override
-    public void onDefinitionShown(SolveWordView view) {
+    public void toggleShowDefinitions() {
         mEditText.setVisibility(View.GONE);
         mEditText.setEnabled(false);
-        if (mCurrentInput != null) {
-            mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
-            mCurrentInput.showInput(true);
+        if (mCurrentInput != null)
+            mCurrentInput.setBackground(getResources().getDrawable(R.drawable.stroke));
+        mCurrentInput = null;
+        for (SolveWordView v : mSolveWordViews) {
+            v.toggleShowDefinition();
         }
-//        mEditText.setInputType(InputType.TYPE_NULL);
-//        mFromUser = false;
     }
 }

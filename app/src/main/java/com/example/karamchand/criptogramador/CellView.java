@@ -15,6 +15,7 @@ public class CellView extends LinearLayout {
     private CellView mPrevious;
     private CellView mNext;
     private CellListener mListener;
+    private boolean definitionShowing;
 
     public CellView(Context context) {
         super(context);
@@ -100,8 +101,8 @@ public class CellView extends LinearLayout {
     //Esto es horrible
     public void requestCursor() {
         LinearLayout layout;
-        if (getParent().getParent() instanceof SolveWordView)
-            layout = (LinearLayout) getParent().getParent();
+        if (getParent().getParent().getParent() instanceof SolveWordView)
+            layout = (LinearLayout) getParent().getParent().getParent();
         else
             layout = (LinearLayout) getParent();
         mListener.onFocusRequested(this, getX(), layout.getY() + ((FrameLayout) mInput.getParent()).getY());
@@ -118,5 +119,27 @@ public class CellView extends LinearLayout {
 
     public void setPunctuation(char c) {
         ((TextView) findViewById(R.id.cell_view_punctuation)).setText(Character.toString(c));
+    }
+
+    @Override
+    public void setActivated(boolean activated) {
+        if (activated) {
+            setBackground(getResources().getDrawable(R.drawable.stroke));
+            ((TextView) findViewById(R.id.cell_view_letter)).setTextColor(Color.BLACK);
+            ((TextView) findViewById(R.id.cell_view_number)).setTextColor(Color.BLACK);
+            ((TextView) findViewById(R.id.cell_view_input)).setTextColor(Color.BLACK);
+            setAlpha(1);
+        } else {
+            setBackground(getResources().getDrawable(R.drawable.disabled));
+            ((TextView) findViewById(R.id.cell_view_letter)).setTextColor(Color.GRAY);
+            ((TextView) findViewById(R.id.cell_view_number)).setTextColor(Color.GRAY);
+            ((TextView) findViewById(R.id.cell_view_input)).setTextColor(Color.GRAY);
+            setAlpha(0.5f);
+        }
+        super.setActivated(activated);
+    }
+
+    public void toggleBackground() {
+//        if (definitionShowing)
     }
 }

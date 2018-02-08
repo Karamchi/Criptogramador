@@ -41,7 +41,18 @@ public class SolveWordView extends LinearLayout {
         letter.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleShowDefinition();
+                mListener.toggleShowDefinitions();
+                if (mDefinition.getVisibility() != VISIBLE)
+                    mChildren.get(0).performClick();
+            }
+        });
+        findViewById(R.id.solve_word_view_definition).
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.toggleShowDefinitions();
+                if (mDefinition.getVisibility() != VISIBLE)
+                    mChildren.get(0).performClick();
             }
         });
         return this;
@@ -70,9 +81,12 @@ public class SolveWordView extends LinearLayout {
         if (mDefinition == null) return;
         if (mDefinition.getVisibility() == GONE) {
             mDefinition.setVisibility(VISIBLE);
-            if (mListener != null) mListener.onDefinitionShown(this);
+            for (CellView c : mChildren)
+                c.setActivated(false);
         } else {
             mDefinition.setVisibility(GONE);
+            for (CellView c : mChildren)
+                c.setActivated(true);
         }
     }
 
@@ -87,6 +101,6 @@ public class SolveWordView extends LinearLayout {
     }
 
     public interface DefinitionShownListener {
-        void onDefinitionShown(SolveWordView view);
+        void toggleShowDefinitions();
     }
 }
