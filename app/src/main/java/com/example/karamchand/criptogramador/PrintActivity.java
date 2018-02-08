@@ -30,6 +30,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     //The numbers that correspond to word i char j
     private ArrayList<ArrayList<Integer>> mLettersState = new ArrayList<>();
+    private ArrayList<String> mDefinitions = new ArrayList<>();
     //The letter and number corresponding to cell i in the phrase (with spaces)
     private ArrayList<Character> mCellLetters = new ArrayList<>();
     private ArrayList<Integer> mCellNumbers = new ArrayList<>();
@@ -107,6 +108,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     private void restoreFromState() {
+        findViewById(R.id.save).setVisibility(View.VISIBLE);
         mLastAdded = null;
         mEditText.setVisibility(View.GONE);
         mCells = new HashMap<>();
@@ -170,6 +172,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             content.add(inputDump.get(i));
         }
         content.add(Integer.toString(mSolution));
+        content.addAll(mDefinitions);
 
         if (useTimestamp) {
             String filename = FileUtils.saveWithTimeStamp(this, mFileId, PATH, content);
@@ -236,7 +239,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         mPunctuation = new HashMap<>();
         mLayout.removeAllViews();
         boolean readingWords = true;
-        for (int i = 0; i < contents.size() - 1; i += 2) {
+        int i;
+        for (i = 0; i < contents.size() - 1; i += 2) {
             String topRow = contents.get(i);
             String bottomRow = contents.get(i + 1);
             if (!topRow.isEmpty() && ALPHABET.toUpperCase().contains(Character.toString(topRow.charAt(0)))) {
@@ -252,10 +256,16 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 if (word.size() > 0)
                     mLettersState.add(word);
             } else {
+                if (!topRow.contains("\t")) break;
                 loadPhraseLine(topRow.split("\t"), bottomRow.split("\t"));
             }
         }
-        mSolution = Integer.parseInt(contents.get(contents.size() - 1));
+        for (; i < contents.size(); i++) {
+            if (contents.get(i).replaceAll("[0-9]", "").length() > 0)
+                mDefinitions.add(contents.get(i));
+            else
+                mSolution = Integer.parseInt(contents.get(i));
+        }
         long t = System.currentTimeMillis();
         restoreFromState();
         Log.e("Time to restore", Long.toString(System.currentTimeMillis() - t));
