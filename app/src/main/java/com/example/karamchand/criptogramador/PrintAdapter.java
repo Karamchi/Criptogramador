@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class PrintAdapter extends RecyclerView.Adapter {
 
     private final Context mContext;
-    private ArrayList<ArrayList<CellData>> mDataset;
+    private ArrayList<ArrayList<CellData>> mDataset = new ArrayList<>();
 
     public PrintAdapter(Context context) {
         mContext = context;
