@@ -1,6 +1,7 @@
 package com.example.karamchand.criptogramador;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +19,9 @@ public class PrintAdapter extends RecyclerView.Adapter {
     private CellView.CellListener mCellListener;
     private int mLettersLength;
 
-    private HashMap<Integer, Character> mAdapterInput;
-    private HashMap<Integer, CellView> mAdapterCells;
+    public HashMap<Integer, String> mAdapterInput = new HashMap<>();
+    private HashMap<Integer, CellView> mAdapterCells = new HashMap<>();
+    private Integer mCurrentInput;
 
     public PrintAdapter(Context context) {
         mContext = context;
@@ -65,6 +67,36 @@ public class PrintAdapter extends RecyclerView.Adapter {
         mLettersLength = length;
     }
 
+    public void setInput(Integer mCurrentInput, String s) {
+        if (mCurrentInput == null) return;
+        mAdapterInput.put(mCurrentInput, s);
+        updateItem(mCurrentInput);
+    }
+
+    public void updateItem(int mCurrentInput) {
+        for (int i = 0; i<mDataset.size(); i++) {
+            for (CellData c : mDataset.get(i)) {
+                if (c.number == mCurrentInput) {
+                    notifyItemChanged(i);
+                }
+            }
+        }
+    }
+
+    public void setCurrentInput(Integer currentInput) {
+        /*if (mAdapterCells.get(mCurrentInput) != null) {
+            mAdapterCells.get(mCurrentInput).showInput(true);
+            mAdapterCells.get(mCurrentInput).setBackground(R.drawable.stroke);
+        }
+        mCurrentInput = currentInput;
+        if (currentInput != null) {
+            mAdapterCells.get(currentInput).setBackgroundColor(Color.LTGRAY);
+            mAdapterCells.get(currentInput).showInput(false);
+        }*/
+        mCurrentInput = currentInput;
+        updateItem(mCurrentInput);
+    }
+
     private class PrintViewholder extends RecyclerView.ViewHolder {
         private final LinearLayout mLayout;
         private TextView textView;
@@ -84,16 +116,28 @@ public class PrintAdapter extends RecyclerView.Adapter {
                 CellView view;
                 if (cellData.number == 0)
                     view = new CellView(mContext).black();
-                else
+                else {
                     view = new CellView(mContext).with(cellData.letter, cellData.number)
                             .withListener(mCellListener);
-                view.setPunctuation(cellData.punctuation);
-                if (lastAdded != null) {
-                    view.setPrevious(lastAdded);
-                    lastAdded.setNext(view);
+                    view.setPunctuation(cellData.punctuation);
+                    view.setInput(mAdapterInput.get(cellData.number), false);
+                    if (lastAdded != null) {
+                        view.setPrevious(lastAdded);
+                        lastAdded.setNext(view);
+                    }
+                    lastAdded = view;
+
+                    if (mCurrentInput != null && mCurrentInput == view.mNumber) {
+                        view.showInput(false);
+                        view.setBackgroundColor(Color.DKGRAY);
+                    } else {
+                        view.showInput(true);
+                        view.setBackground(R.drawable.stroke);
+                    }
+
                 }
-                lastAdded = view;
                 mLayout.addView(view);
+                mAdapterCells.put(cellData.number, view);
             }
         }
 

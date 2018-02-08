@@ -48,7 +48,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private RecyclerView mRecycler;
     private ArrayList<CellData> mLastRow;
     private EditText mEditText;
-    private CellView mCurrentInput;
+    private Integer mCurrentInput;
     private boolean mFromUser;
     private int mSolution;
     private PrintAdapter mAdapter;
@@ -87,7 +87,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 if (before == 1 && count == 0 && android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M)
                     return; // Api < 23 va a llamar a onkeydown
                 boolean b = mEditText.getSelectionStart() > 1;
-                mCurrentInput.setInput(s.toString(), b);
+                mAdapter.setInput(mCurrentInput, s.toString());
+//                mCurrentInput.setInput(s.toString(), b);
                 if (b || s.length() == 0) mEditText.setSelection(Math.min(mEditText.length(), 1));
                 checkForSolution();
             }
@@ -147,7 +148,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         if (mCells.containsKey(i)) {
             v.setTwin(mCells.get(i));
             if (mInput.containsKey(i) && c != ' ')
-                v.setInput(Character.toString(mInput.get(i)), false);
+                mAdapter.setInput(i, Character.toString(mInput.get(i)));
+//                v.setInput(Character.toString(mInput.get(i)), false);
         } else {
             mCells.put(i, v);
         }
@@ -211,7 +213,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             int i = mCellNumbers.get(j);
             String input = null;
             if (mCells.containsKey(i))
-                input = Character.toString(mCells.get(i).input);
+                input = mAdapter.mAdapterInput.get(i);
             if (input == null || input.equals(""))
                 input = " ";
             word += input + '\t';
@@ -296,7 +298,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_DEL && mEditText.getSelectionStart() == 0) {
-            mCurrentInput.setInput("", false);
+            mAdapter.setInput(mCurrentInput, "");
+//            mCurrentInput.setInput("", false);
             mEditText.setSelection(Math.min(mEditText.length(), 1));
             return true;
         }
@@ -309,15 +312,10 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         ((FrameLayout) mEditText.getParent()).setX(x);
         ((FrameLayout) mEditText.getParent()).setY(y);
 
-        if (mCurrentInput != null) {
-            mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
-            mCurrentInput.showInput(true);
-        }
-        cellView.setBackgroundColor(Color.LTGRAY);
         mFromUser = false;
         mEditText.setText(cellView.getInput());
-        cellView.showInput(false);
-        mCurrentInput = cellView;
+        mCurrentInput = cellView.mNumber;
+        mAdapter.setCurrentInput(mCurrentInput);
     }
 
     @Override

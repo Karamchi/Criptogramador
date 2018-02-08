@@ -3,7 +3,6 @@ package com.example.karamchand.criptogramador;
 public class CellData {
     public char letter;
     public int number;
-    public char input;
     public char punctuation;
     public CellData twin;
 
@@ -24,7 +23,4 @@ public class CellData {
         this.twin = twin;
     }
 
-    public void setInput(String s, boolean b) {
-        input = s.charAt(0);
-    }
 }

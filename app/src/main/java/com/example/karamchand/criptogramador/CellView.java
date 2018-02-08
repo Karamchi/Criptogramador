@@ -2,6 +2,7 @@ package com.example.karamchand.criptogramador;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -15,6 +16,7 @@ public class CellView extends LinearLayout {
     private CellView mPrevious;
     private CellView mNext;
     private CellListener mListener;
+    public int mNumber;
 
     public CellView(Context context) {
         super(context);
@@ -37,6 +39,7 @@ public class CellView extends LinearLayout {
     }
 
     public CellView with(char c, int i) {
+        mNumber = i;
         ((TextView) findViewById(R.id.cell_view_letter)).setText(Character.toString(c));
         ((TextView) findViewById(R.id.cell_view_number)).setText(Integer.toString(i));
         setBackground(getResources().getDrawable(R.drawable.stroke));
@@ -63,6 +66,7 @@ public class CellView extends LinearLayout {
     }
 
     public void setInput(String input, boolean overwriteNext) {
+        if (input == null) return;
         input = input.toUpperCase().replace(" ", "");
         if (input.length() == 0) {
             mInput.setText("");
@@ -71,7 +75,7 @@ public class CellView extends LinearLayout {
                 mPrevious.requestCursor();
         } else {
             mInput.setText(input.substring(0, 1));
-            mTwin.setInputFromTwin(input.substring(0, 1));
+//            mTwin.setInputFromTwin(input.substring(0, 1));
             if (mNext != null) {
                 if (input.length() == 2 && overwriteNext)
                     mNext.setInput(input.substring(1, 2), false);
@@ -109,6 +113,10 @@ public class CellView extends LinearLayout {
 
     public String getInput() {
         return mInput.getText().toString();
+    }
+
+    public void setBackground(@DrawableRes int drawable) {
+        setBackground(getResources().getDrawable(drawable));
     }
 
     public interface CellListener extends OnClickListener {
