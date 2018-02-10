@@ -4,10 +4,12 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Process;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.karamchand.criptogramador.filters.AbstractFilter;
 import com.example.karamchand.criptogramador.filters.ConsonantsFilter;
@@ -18,6 +20,7 @@ import com.example.karamchand.criptogramador.filters.LettersFilter;
 import com.example.karamchand.criptogramador.filters.StartsWithFilter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
@@ -28,7 +31,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
     private final ArrayList<String> mAlphaCorpus;
     private final SearchListener mListener;
     private ArrayList<String> mFilteredCorpus;
-    private ArrayList<Integer> mConsonants = new ArrayList<>();
+    private HashMap<String, Integer> mConsonants = new HashMap<>();
     private ArrayList<String> mFilteredAlphaCorpus;
     private ArrayList<AbstractFilter> mFilters;
     private UpdateAllTask mRunningTask;
@@ -80,7 +83,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
                 filter = new LettersFilter().with(s);
                 break;
             case SearchActivity.CONSONANTS:
-                filter = new ConsonantsFilter().with(s);
+                filter = new ConsonantsFilter(mConsonants).with(s);
         }
         AbstractFilter oldFilter = mFilters.get(filterType);
         mFilters.set(filterType, filter);
@@ -158,10 +161,17 @@ public class SearchAdapter extends RecyclerView.Adapter {
         @Override
         protected Object doInBackground(Object[] objects) {
             for (int i = 0; i < mAlphaCorpus.size(); i++) {
-                mConsonants.add(mAlphaCorpus.get(i).substring(1).replaceAll("a|e|i|o|u", "").length());
+                mConsonants.put(
+                        mAlphaCorpus.get(i),
+                        mAlphaCorpus.get(i).substring(1).replaceAll("a|e|i|o|u", "").length());
             }
             return null;
         }
+
+        /*@Override
+        protected void onPostExecute(Object o) {
+            Log.e("finish", "task");
+        }*/
     }
 
     public class UpdateAllTask extends AsyncTask<String, Void, String> {
@@ -184,7 +194,6 @@ public class SearchAdapter extends RecyclerView.Adapter {
         }
 
         @Override
-
         protected void onPostExecute(String s) {
             notifyDataSetChanged();
             mFilteredCorpus = newFilter;

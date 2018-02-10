@@ -1,8 +1,15 @@
 package com.example.karamchand.criptogramador.filters;
 
+import java.util.HashMap;
+
 public class ConsonantsFilter extends AbstractFilter {
 
+    private final HashMap<String, Integer> mConsonants;
     private Integer mNumberParam;
+
+    public ConsonantsFilter(HashMap<String, Integer> consonants) {
+        mConsonants = consonants;
+    }
 
     @Override
     public AbstractFilter with(String mParams) {
@@ -26,18 +33,13 @@ public class ConsonantsFilter extends AbstractFilter {
 
     @Override
     public boolean filter(String s) {
-        return mNumberParam == null ||
-                mNumberParam <= consonants(s);
+        return mNumberParam == null
+                || (mConsonants.containsKey(s) && mConsonants.get(s) <= mNumberParam)
+                || mNumberParam <= consonants(s);
     }
 
     private int consonants(String s) {
-        int count = 0;
-        for (char c : s.toCharArray()) {
-            if (!"aeiou".contains(Character.toString(c))) {
-                count++;
-            }
-        }
-        return count;
+        return s.substring(1).replaceAll("a|e|i|o|u", "").length();
     }
 
 }
