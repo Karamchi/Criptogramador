@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -46,17 +46,18 @@
 
     </LinearLayout>
 
-    <ScrollView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <HorizontalScrollView
+        <ScrollView
+            android:id="@+id/scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:id="@+id/activity_print_layout"
@@ -64,29 +65,29 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"/>
 
-                <FrameLayout
-                    android:layout_width="45dp"
-                    android:layout_height="wrap_content">
+            </HorizontalScrollView>
 
-                    <EditText
-                        android:id="@+id/print_activity_edit_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:paddingLeft="2dp"
-                        android:paddingRight="2dp"
-                        android:textColor="@android:color/black"
-                        android:visibility="gone"
-                        android:cursorVisible="true"
-                        android:digits="@string/alphabet"
-                        android:background="@android:color/transparent"/>
+        </ScrollView>
 
-                    </FrameLayout>
+        <FrameLayout
+            android:layout_width="45dp"
+            android:layout_height="wrap_content">
 
-            </FrameLayout>
+            <EditText
+                android:id="@+id/print_activity_edit_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
+                android:textColor="@android:color/black"
+                android:visibility="gone"
+                android:cursorVisible="true"
+                android:digits="@string/alphabet"
+                android:background="@android:color/transparent"/>
 
-        </HorizontalScrollView>
+        </FrameLayout>
 
-    </ScrollView>
+    </FrameLayout>
 
 </LinearLayout>

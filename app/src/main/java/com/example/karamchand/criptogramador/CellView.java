@@ -97,14 +97,22 @@ public class CellView extends LinearLayout {
         mNext = next;
     }
 
-    //Esto es horrible
     public void requestCursor() {
-        LinearLayout layout;
-        if (getParent().getParent() instanceof SolveWordView)
-            layout = (LinearLayout) getParent().getParent();
-        else
-            layout = (LinearLayout) getParent();
-        mListener.onFocusRequested(this, getX(), layout.getY() + ((FrameLayout) mInput.getParent()).getY());
+        mListener.onFocusRequested(this, getAbsoluteX(), getAbsoluteY());
+    }
+
+    //Toda esta mierda es necesaria porque desde android 6 NO HAY FORMA de evitar que al focusear
+    //una vista adentro de un scrollview del orto el forrito escrolee a 0.
+    public float getAbsoluteY() {
+        int[] liw = new int[2];
+        getLocationOnScreen(liw);
+        return liw[1] + ((View) mInput.getParent()).getY();
+    }
+
+    public float getAbsoluteX() {
+        int[] liw = new int[2];
+        getLocationOnScreen(liw);
+        return liw[0];
     }
 
     public String getInput() {

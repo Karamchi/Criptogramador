@@ -1,7 +1,9 @@
 package com.example.karamchand.criptogramador;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -10,10 +12,13 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +54,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private CellView mCurrentInput;
     private boolean mFromUser;
     private int mSolution;
+    private int yOffset;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,7 +79,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         setupToolbar();
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -90,8 +97,31 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
+        final ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_view);
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                if (mCurrentInput == null) return;
+                float absoluteY = mCurrentInput.getAbsoluteY();
+                ((View) mEditText.getParent()).setY(absoluteY - getStatusBarHeight());
+                float absoluteX = mCurrentInput.getAbsoluteX();
+                ((View) mEditText.getParent()).setX(absoluteX);
+            }
+        });
+    }
+
+    //Por supuesto que esto no anda hasta que está creada la vista
+    @SuppressLint("WrongViewCast")
+    public float getStatusBarHeight() {
+        if (yOffset == 0) {
+            Rect rectangle = new Rect();
+            getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
+            yOffset = rectangle.top + ((View) findViewById(R.id.load).getParent()).getHeight();
+        }
+        return yOffset;
     }
 
     private void setupToolbar() {
@@ -277,7 +307,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         for (int i = 0; i < topRow.length; i += 2) {
             mCellLetters.add(topRow[i].charAt(0));
             int number = 0;
-            if (!topRow[i+1].equals(" "))
+            if (!topRow[i + 1].equals(" "))
                 number = Integer.parseInt(topRow[i + 1]);
             mCellNumbers.add(number);
 
@@ -304,8 +334,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     //Podría evitar esto al restorear pero no cambia el tiempo.
     @Override
     public void onFocusRequested(CellView cellView, float x, float y) {
-        ((FrameLayout) mEditText.getParent()).setX(x);
-        ((FrameLayout) mEditText.getParent()).setY(y);
+        ((FrameLayout) mEditText.getParent()).setX(x - mLayout.getX());
+        ((FrameLayout) mEditText.getParent()).setY(y - mLayout.getY() - getStatusBarHeight());
 
         if (mCurrentInput != null) {
             mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
