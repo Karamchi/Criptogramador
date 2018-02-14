@@ -46,7 +46,12 @@ public class RowView extends LinearLayout {
 
         percentageView.setText(String.format("%d%%", percentage));
         percentageView.setBackgroundColor(color);
-        ((TextView) findViewById(R.id.remaining)).setText(Integer.toString(mTotal - mAmount));
+
+        int diff = mTotal - mAmount;
+        if (diff != 0)
+            ((TextView) findViewById(R.id.remaining)).setText(Integer.toString(diff));
+        else
+            ((TextView) findViewById(R.id.remaining)).setText("");
 
     }
 

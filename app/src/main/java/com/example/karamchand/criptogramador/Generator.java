@@ -43,7 +43,7 @@ public class Generator {
     private void buildPunctuation(String phrase) {
         int letterCount = 0;
         for (char c : phrase.toCharArray()) {
-            if ((ALPHABET + "áéíóúû").contains(Character.toString(c)))
+            if ((ALPHABET + "áéíóúü").contains(Character.toString(c)))
                 letterCount++;
             else if (c != ' ')
                 mPunctuation.put(letterCount, c);
