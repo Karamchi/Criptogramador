@@ -118,6 +118,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         mCells = new HashMap<>();
         mAdapter.setLettersState(mLettersState);
         mAdapter.setPhrase(mCellLetters, mCellNumbers, mInput, mPunctuation);
+        mAdapter.setEditText(mEditText);
 
         RecyclerView.LayoutManager layoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -272,9 +273,9 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     //Podría evitar esto al restorear pero no cambia el tiempo.
     @Override
-    public void onFocusRequested(CellView cellView, float x, float y) {
-        ((FrameLayout) mEditText.getParent()).setX(x);
-        ((FrameLayout) mEditText.getParent()).setY(y);
+    public void onFocusRequested(CellView cellView) {
+
+        mEditText.requestFocus();
 
         mFromUser = false;
         mEditText.setText(cellView.getInput());

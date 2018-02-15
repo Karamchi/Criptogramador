@@ -5,7 +5,8 @@ import android.graphics.Color;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -77,14 +78,8 @@ public class CellView extends LinearLayout {
         mNext = next;
     }
 
-    //Esto es horrible
     public void requestCursor() {
-        LinearLayout layout;
-        if (getParent().getParent() instanceof SolveWordView)
-            layout = (LinearLayout) getParent().getParent();
-        else
-            layout = (LinearLayout) getParent();
-        mListener.onFocusRequested(this, getX(), layout.getY() + ((FrameLayout) mInput.getParent()).getY());
+        mListener.onFocusRequested(this);
     }
 
     public String getInput() {
@@ -116,9 +111,16 @@ public class CellView extends LinearLayout {
         mInput.setText(s);
     }
 
+    public void setFocused(EditText editText) {
+        FrameLayout fl = (FrameLayout) mInput.getParent();
+        ViewGroup fl2 = (ViewGroup) editText.getParent();
+        fl2.removeView(editText);
+        fl.addView(editText);
+    }
+
     public interface CellListener extends OnClickListener {
 
-        void onFocusRequested(CellView cellView, float x, float y);
+        void onFocusRequested(CellView cellView);
     }
 
     public void setPunctuation(char c) {

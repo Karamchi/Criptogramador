@@ -3,9 +3,12 @@ package com.example.karamchand.criptogramador;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,6 +26,7 @@ public class PrintAdapter extends RecyclerView.Adapter {
 
     public HashMap<Integer, String> mAdapterInput = new HashMap<>();
     private CellView mCurrentInput;
+    private EditText mEditText;
 
     public PrintAdapter(Context context) {
         mContext = context;
@@ -41,7 +45,9 @@ public class PrintAdapter extends RecyclerView.Adapter {
             vh.setLetter((LettersView.ALPHABET.toUpperCase() + LettersView.ALPHABET).charAt(position));
         else
             vh.setLetter(null);
+        long t = System.currentTimeMillis();
         ((PrintViewholder) holder).setItem(mDataset.get(position));
+        Log.e("Time to set", Long.toString(System.currentTimeMillis() - t));
         if (position > 0) {
             vh.setPrevious(mDataset.get(position - 1));
         }
@@ -135,6 +141,10 @@ public class PrintAdapter extends RecyclerView.Adapter {
         mDataset.add(mLastRow);
     }
 
+    public void setEditText(EditText editText) {
+        mEditText = editText;
+    }
+
     private class PrintViewholder extends RecyclerView.ViewHolder {
         private final LinearLayout mLayout;
         private final ArrayList<CellView> mChildren = new ArrayList<>();
@@ -179,6 +189,7 @@ public class PrintAdapter extends RecyclerView.Adapter {
                     if (mCurrentInput != null && mCurrentInput.mNumber == view.mNumber) {
                         view.showInput(false);
                         view.setBackgroundColor(Color.DKGRAY);
+                        view.setFocused(mEditText);
                     } else {
                         view.showInput(true);
                         view.setBackground(R.drawable.stroke);
