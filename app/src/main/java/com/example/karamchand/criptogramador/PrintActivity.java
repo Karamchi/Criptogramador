@@ -158,7 +158,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         mLastRow.addView(new CellView(this).black());
     }
 
-    private void save(boolean useTimestamp) {
+    private void save(boolean showToast) {
         ArrayList<String> content = new ArrayList<>();
         for (ArrayList<Integer> wordState : mLettersState) {
             String word = "";
@@ -176,9 +176,9 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         content.add(Integer.toString(mSolution));
         content.addAll(mDefinitions);
 
-        if (useTimestamp) {
-            String filename = FileUtils.saveWithTimeStamp(this, mFileId, PATH, content);
-            Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
+        if (showToast) {
+            FileUtils.save(this, PATH, mFileId, content);
+            Toast.makeText(this, "File written to " + mFileId, Toast.LENGTH_SHORT).show();
         } else {
             FileUtils.save(this, PATH, "temp", content);
         }
