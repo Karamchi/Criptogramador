@@ -38,7 +38,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private ArrayList<Character> mCellLetters = new ArrayList<>();
     private ArrayList<Integer> mCellNumbers = new ArrayList<>();
     //For every cell on the phrase, the input
-    private HashMap<Integer, Character> mInput = new HashMap<>();
+    private HashMap<Integer, String> mInput = new HashMap<>();
     //For every cell on the phrase with punctuation, the char for its number
     private HashMap<Integer, Character> mPunctuation = new HashMap<>();
 
@@ -46,9 +46,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private HashMap<Integer, CellData> mCells;
 
     private RecyclerView mRecycler;
-    private ArrayList<CellData> mLastRow;
     private EditText mEditText;
-    private Integer mCurrentInput;
     private boolean mFromUser;
     private int mSolution;
     private PrintAdapter mAdapter;
@@ -87,8 +85,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 if (before == 1 && count == 0 && android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M)
                     return; // Api < 23 va a llamar a onkeydown
                 boolean b = mEditText.getSelectionStart() > 1;
-                mAdapter.setInput(mCurrentInput, s.toString());
-//                mCurrentInput.setInput(s.toString(), b);
+                mAdapter.setInput(s.toString(), b);
                 if (b || s.length() == 0) mEditText.setSelection(Math.min(mEditText.length(), 1));
                 checkForSolution();
             }
@@ -115,51 +112,18 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     private void restoreFromState() {
         findViewById(R.id.save).setVisibility(View.VISIBLE);
-//        mLastAdded = null;
         mEditText.setVisibility(View.GONE);
         mAdapter = new PrintAdapter(this).withlistener(this);
         mAdapter.setLettersLength(mLettersState.size());
         mCells = new HashMap<>();
-        for (ArrayList<Integer> word : mLettersState) {
-            mLastRow = new ArrayList<>();
-            for (Integer i : word)
-                addCell(' ', i);
-            mAdapter.add(mLastRow);
-        }
-        mLastRow = new ArrayList<>();
-        for (int i = 0; i < mCellLetters.size(); i++) {
-            if (mCellLetters.get(i) == ' ')
-                addBlackCell();
-            else
-                addCell(mCellLetters.get(i), mCellNumbers.get(i));
-            if ((i + 1) % ROW_WIDTH == 0) {
-                mAdapter.add(mLastRow);
-                mLastRow = new ArrayList<>();
-            }
-        }
-        mAdapter.add(mLastRow);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mAdapter.setLettersState(mLettersState);
+        mAdapter.setPhrase(mCellLetters, mCellNumbers, mInput, mPunctuation);
+
+        RecyclerView.LayoutManager layoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecycler.setLayoutManager(layoutManager);
         mRecycler.setAdapter(mAdapter);
-    }
-
-    private void addCell(char c, int i) {
-        CellData v = new CellData(c, i);
-        if (mCells.containsKey(i)) {
-            v.setTwin(mCells.get(i));
-            if (mInput.containsKey(i) && c != ' ')
-                mAdapter.setInput(i, Character.toString(mInput.get(i)));
-//                v.setInput(Character.toString(mInput.get(i)), false);
-        } else {
-            mCells.put(i, v);
-        }
-        if (mPunctuation.containsKey(i) && c != ' ')
-            v.setPunctuation(mPunctuation.get(i));
-        mLastRow.add(v);
-    }
-
-    private void addBlackCell() {
-        mLastRow.add(new CellData());
+        mRecycler.getItemAnimator().setChangeDuration(0);
     }
 
     private void save(boolean useTimestamp) {
@@ -285,7 +249,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 number = Integer.parseInt(topRow[i + 1]);
             mCellNumbers.add(number);
 
-            mInput.put(number, string2Char(bottomRow[i]));
+            mInput.put(number, bottomRow[i]);
             if (!bottomRow[i + 1].equals(" "))
                 mPunctuation.put(number, string2Char(bottomRow[i + 1]));
         }
@@ -298,7 +262,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_DEL && mEditText.getSelectionStart() == 0) {
-            mAdapter.setInput(mCurrentInput, "");
+            mAdapter.setInput("", false);
 //            mCurrentInput.setInput("", false);
             mEditText.setSelection(Math.min(mEditText.length(), 1));
             return true;
@@ -314,8 +278,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
         mFromUser = false;
         mEditText.setText(cellView.getInput());
-        mCurrentInput = cellView.mNumber;
-        mAdapter.setCurrentInput(mCurrentInput);
+        mAdapter.setCurrentInput(cellView);
     }
 
     @Override

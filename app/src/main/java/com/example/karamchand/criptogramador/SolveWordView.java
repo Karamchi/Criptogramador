@@ -31,7 +31,7 @@ public class SolveWordView extends LinearLayout {
     private void init() {
         inflate(getContext(), R.layout.solve_word_view, this);
     }
-
+/*
     public SolveWordView withLetter(char c) {
         TextView letter = ((TextView) findViewById(R.id.solve_word_view_letter));
         letter.setVisibility(VISIBLE);
@@ -54,6 +54,6 @@ public class SolveWordView extends LinearLayout {
     @Override
     public void addView(View child) {
         ((LinearLayout) findViewById(R.id.solve_word_view_layout)).addView(child);
-    }
+    }*/
 
 }

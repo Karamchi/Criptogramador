@@ -14,14 +14,15 @@ import java.util.HashMap;
 
 public class PrintAdapter extends RecyclerView.Adapter {
 
+    private static final int ROW_WIDTH = 10;
+
     private final Context mContext;
     private ArrayList<ArrayList<CellData>> mDataset = new ArrayList<>();
     private CellView.CellListener mCellListener;
     private int mLettersLength;
 
     public HashMap<Integer, String> mAdapterInput = new HashMap<>();
-    private HashMap<Integer, CellView> mAdapterCells = new HashMap<>();
-    private Integer mCurrentInput;
+    private CellView mCurrentInput;
 
     public PrintAdapter(Context context) {
         mContext = context;
@@ -54,10 +55,6 @@ public class PrintAdapter extends RecyclerView.Adapter {
         return mDataset.size();
     }
 
-    public void add(ArrayList<CellData> mLastRow) {
-        mDataset.add(mLastRow);
-    }
-
     public PrintAdapter withlistener(CellView.CellListener l) {
         mCellListener = l;
         return this;
@@ -67,10 +64,27 @@ public class PrintAdapter extends RecyclerView.Adapter {
         mLettersLength = length;
     }
 
-    public void setInput(Integer mCurrentInput, String s) {
+    public void setInput(String input, boolean overwriteNext) {
+
         if (mCurrentInput == null) return;
-        mAdapterInput.put(mCurrentInput, s);
-        updateItem(mCurrentInput);
+
+        if (input == null) return;
+        input = input.toUpperCase().replace(" ", "");
+        if (input.length() == 0) {
+            mAdapterInput.put(mCurrentInput.mNumber, input);
+            updateItem(mCurrentInput.mNumber);
+            if (mCurrentInput.mPrevious != null)
+                mCurrentInput.mPrevious.requestCursor();
+            updateItem(mCurrentInput.mNumber);
+        } else {
+            mAdapterInput.put(mCurrentInput.mNumber, input.substring(0, 1));
+            updateItem(mCurrentInput.mNumber);
+            if (mCurrentInput.mNext != null) {
+                mCurrentInput.mNext.requestCursor();
+                if (input.length() == 2 && overwriteNext)
+                    setInput(input.substring(1, 2), false);
+            }
+        }
     }
 
     public void updateItem(int mCurrentInput) {
@@ -83,22 +97,47 @@ public class PrintAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public void setCurrentInput(Integer currentInput) {
-        /*if (mAdapterCells.get(mCurrentInput) != null) {
-            mAdapterCells.get(mCurrentInput).showInput(true);
-            mAdapterCells.get(mCurrentInput).setBackground(R.drawable.stroke);
+    public void setCurrentInput(CellView currentInput) {
+        int placeholder = 0;
+        if (mCurrentInput != null)
+            placeholder = mCurrentInput.mNumber;
+        mCurrentInput = new CellView(currentInput);
+        updateItem(mCurrentInput.mNumber);
+        updateItem(placeholder);
+    }
+
+    public void setLettersState(ArrayList<ArrayList<Integer>> mLettersState) {
+        for (ArrayList<Integer> word : mLettersState) {
+            ArrayList<CellData> mLastRow = new ArrayList<>();
+            for (Integer i : word)
+                mLastRow.add(new CellData(' ', i));
+            mDataset.add(mLastRow);
         }
-        mCurrentInput = currentInput;
-        if (currentInput != null) {
-            mAdapterCells.get(currentInput).setBackgroundColor(Color.LTGRAY);
-            mAdapterCells.get(currentInput).showInput(false);
-        }*/
-        mCurrentInput = currentInput;
-        updateItem(mCurrentInput);
+    }
+
+    public void setPhrase(ArrayList<Character> mCellLetters, ArrayList<Integer> mCellNumbers,
+                          HashMap<Integer, String> mInput, HashMap<Integer, Character> mPunctuation) {
+        this.mAdapterInput = mInput;
+        ArrayList<CellData> mLastRow = new ArrayList<>();
+        for (int i = 0; i < mCellLetters.size(); i++) {
+            if (mCellLetters.get(i) == ' ')
+                mLastRow.add(new CellData());
+            else {
+                int j = mCellNumbers.get(i);
+                mCellLetters.get(i);
+                mLastRow.add(new CellData(mCellLetters.get(i), j, mPunctuation.get(j)));
+            }
+            if ((i + 1) % ROW_WIDTH == 0) {
+                mDataset.add(mLastRow);
+                mLastRow = new ArrayList<>();
+            }
+        }
+        mDataset.add(mLastRow);
     }
 
     private class PrintViewholder extends RecyclerView.ViewHolder {
         private final LinearLayout mLayout;
+        private final ArrayList<CellView> mChildren = new ArrayList<>();
         private TextView textView;
 
         public PrintViewholder(View v) {
@@ -109,25 +148,35 @@ public class PrintAdapter extends RecyclerView.Adapter {
         }
 
         public void setItem(ArrayList<CellData> cellDatas) {
-            mLayout.removeAllViews();
-            mLayout.addView(textView);
             CellView lastAdded = null;
-            for (CellData cellData : cellDatas) {
+            int i;
+            for (i = 0; i < cellDatas.size(); i++) {
+                CellData cellData = cellDatas.get(i);
                 CellView view;
+                if (mChildren.size() <= i) {
+                    view = new CellView(mContext);
+                    mLayout.addView(view);
+                    mChildren.add(view);
+                } else {
+                    view = mChildren.get(i);
+                    view.setVisibility(View.VISIBLE);
+                }
+
                 if (cellData.number == 0)
-                    view = new CellView(mContext).black();
+                    view.setBlack(true);
                 else {
-                    view = new CellView(mContext).with(cellData.letter, cellData.number)
-                            .withListener(mCellListener);
+                    view.setBlack(false);
+                    view.setLetterNumber(cellData.letter, cellData.number);
+                    view.setListener(mCellListener);
                     view.setPunctuation(cellData.punctuation);
-                    view.setInput(mAdapterInput.get(cellData.number), false);
+                    view.setInput(mAdapterInput.get(cellData.number));
                     if (lastAdded != null) {
                         view.setPrevious(lastAdded);
                         lastAdded.setNext(view);
                     }
                     lastAdded = view;
 
-                    if (mCurrentInput != null && mCurrentInput == view.mNumber) {
+                    if (mCurrentInput != null && mCurrentInput.mNumber == view.mNumber) {
                         view.showInput(false);
                         view.setBackgroundColor(Color.DKGRAY);
                     } else {
@@ -136,8 +185,9 @@ public class PrintAdapter extends RecyclerView.Adapter {
                     }
 
                 }
-                mLayout.addView(view);
-                mAdapterCells.put(cellData.number, view);
+            }
+            for (; i<mChildren.size(); i++) {
+                mChildren.get(i).setVisibility(View.GONE);
             }
         }
 

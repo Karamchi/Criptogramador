@@ -13,8 +13,8 @@ import android.widget.TextView;
 public class CellView extends LinearLayout {
     private TextView mInput;
     private CellView mTwin;
-    private CellView mPrevious;
-    private CellView mNext;
+    public CellView mPrevious;
+    public CellView mNext;
     private CellListener mListener;
     public int mNumber;
 
@@ -33,38 +33,18 @@ public class CellView extends LinearLayout {
         init();
     }
 
+    public CellView(CellView currentInput) {
+        super(currentInput.getContext());
+        mNumber = currentInput.mNumber;
+        setNext(currentInput.mNext);
+        setPrevious(currentInput.mPrevious);
+    }
+
     private void init() {
         inflate(getContext(), R.layout.cell_view, this);
         mInput = ((TextView) findViewById(R.id.cell_view_input));
     }
-
-    public CellView with(char c, int i) {
-        mNumber = i;
-        ((TextView) findViewById(R.id.cell_view_letter)).setText(Character.toString(c));
-        ((TextView) findViewById(R.id.cell_view_number)).setText(Integer.toString(i));
-        setBackground(getResources().getDrawable(R.drawable.stroke));
-        return this;
-    }
-
-    public CellView withListener(CellListener listener) {
-        mListener = listener;
-        setOnClickListener(listener);
-        return this;
-    }
-
-    public CellView black() {
-        mInput.setVisibility(GONE);
-        setBackgroundColor(Color.BLACK);
-        return this;
-    }
-
-    public void setTwin(CellView other) {
-        if (mTwin == null) {
-            mTwin = other;
-            other.setTwin(this);
-        }
-    }
-
+/*
     public void setInput(String input, boolean overwriteNext) {
         if (input == null) return;
         input = input.toUpperCase().replace(" ", "");
@@ -83,11 +63,7 @@ public class CellView extends LinearLayout {
             }
         }
 
-    }
-
-    public void setInputFromTwin(String input) {
-        mInput.setText(input);
-    }
+    }*/
 
     public void showInput(boolean show) {
         mInput.setVisibility(show ? VISIBLE : INVISIBLE);
@@ -117,6 +93,27 @@ public class CellView extends LinearLayout {
 
     public void setBackground(@DrawableRes int drawable) {
         setBackground(getResources().getDrawable(drawable));
+    }
+
+    public void setBlack(boolean b) {
+        mInput.setVisibility(b ? GONE : VISIBLE);
+        setBackgroundColor(b ? Color.BLACK : Color.WHITE); //Fix
+    }
+
+    public void setLetterNumber(char c, int i) {
+        mNumber = i;
+        ((TextView) findViewById(R.id.cell_view_letter)).setText(Character.toString(c));
+        ((TextView) findViewById(R.id.cell_view_number)).setText(Integer.toString(i));
+        setBackground(getResources().getDrawable(R.drawable.stroke));
+    }
+
+    public void setListener(CellListener listener) {
+        mListener = listener;
+        setOnClickListener(listener);
+    }
+
+    public void setInput(String s) {
+        mInput.setText(s);
     }
 
     public interface CellListener extends OnClickListener {
