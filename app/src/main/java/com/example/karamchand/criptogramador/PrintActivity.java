@@ -108,10 +108,30 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 load();
             }
         });
+        findViewById(R.id.hide_all).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for (int i = 0; i < mLayout.getChildCount(); i++) {
+                    if (mLayout.getChildAt(i) instanceof SolveWordView)
+                        ((SolveWordView) mLayout.getChildAt(i)).hideDefinition();
+                }
+            }
+        });
+        findViewById(R.id.show_all).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for (int i = 0; i < mLayout.getChildCount(); i++) {
+                    if (mLayout.getChildAt(i) instanceof SolveWordView)
+                        ((SolveWordView) mLayout.getChildAt(i)).showDefinition();
+                }
+            }
+        });
     }
 
     private void restoreFromState() {
         findViewById(R.id.save).setVisibility(View.VISIBLE);
+        findViewById(R.id.show_all).setVisibility(View.VISIBLE);
+        findViewById(R.id.hide_all).setVisibility(View.VISIBLE);
         mLastAdded = null;
         mEditText.setVisibility(View.GONE);
         mCells = new HashMap<>();
@@ -234,13 +254,12 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         FileUtils.load(this, this, PATH);
     }
 
-//    getPackageManager().checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this.getPackageName())
-
     @Override
     public void onLoad(ArrayList<String> contents, String filename) {
         mFileId = filename.substring(0, 8);
         ((TextView) findViewById(R.id.title)).setText(mFileId);
         mCellLetters = new ArrayList<>();
+        mCellNumbers = new ArrayList<>();
         mLettersState = new ArrayList<>();
         mPunctuation = new HashMap<>();
         mLayout.removeAllViews();
@@ -357,13 +376,9 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     @Override
     public void onDefinitionShown(SolveWordView view) {
-//        mEditText.setVisibility(View.GONE);
-//        mEditText.setEnabled(false);
-//        if (mCurrentInput != null) {
-//            mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
-//            mCurrentInput.showInput(true);
-//        }
-//        mEditText.setInputType(InputType.TYPE_NULL);
-//        mFromUser = false;
+        for (int i = 0; i < mLayout.getChildCount(); i++) {
+            if (mLayout.getChildAt(i) instanceof SolveWordView)
+                ((SolveWordView) mLayout.getChildAt(i)).hideDefinition();
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.karamchand.criptogramador;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -69,20 +70,29 @@ public class SolveWordView extends LinearLayout {
     public void toggleShowDefinition() {
         if (mDefinition == null) return;
         if (mDefinition.getVisibility() == GONE) {
-            mDefinition.setVisibility(VISIBLE);
             if (mListener != null) mListener.onDefinitionShown(this);
-        } else {
-            mDefinition.setVisibility(GONE);
+            showDefinition();
+            getViewAt(0).performClick();
         }
-        //Esto es horrible. La idea es que el cursor quede bien en y, pero como las posiciones nunca
-        //se pueden obtener actualizadas, la unica forma es poniéndolo "arriba" de la verga que
-        //cambio, incluso si lo estoy cerrando. Espero en algún momento poder arreglar esto.
-        getViewAt(0).performClick();
+        else hideDefinition();
+    }
+
+    public void hideDefinition() {
+        if (mDefinition == null) return;
+        mDefinition.setVisibility(GONE);
+        setBackgroundColor(Color.DKGRAY);
+    }
+
+    public void showDefinition() {
+        if (mDefinition == null) return;
+        mDefinition.setVisibility(VISIBLE);
+        setBackgroundColor(Color.BLACK);
     }
 
     public void setDefinition(String s) {
         mDefinition = findViewById(R.id.solve_word_view_definition);
         mDefinition.setText(s);
+        showDefinition();
     }
 
     public SolveWordView withListener(DefinitionShownListener l) {

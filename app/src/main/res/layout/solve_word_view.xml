@@ -4,6 +4,16 @@
              android:layout_height="wrap_content"
              android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/solve_word_view_definition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        android:layout_marginLeft="22dp"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"
+        android:text="Definition"/>
+
     <LinearLayout
         android:id="@+id/solve_word_view_layout"
         android:layout_width="wrap_content"
@@ -18,12 +28,5 @@
             android:text="A"/>
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/solve_word_view_definition"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:text="Definition"/>
 
 </LinearLayout>
