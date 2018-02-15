@@ -70,9 +70,9 @@
 
                     <EditText
                         android:id="@+id/print_activity_edit_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
                         android:paddingLeft="2dp"
                         android:paddingRight="2dp"
                         android:textColor="@android:color/black"
@@ -81,7 +81,7 @@
                         android:digits="@string/alphabet"
                         android:background="@android:color/transparent"/>
 
-                    </FrameLayout>
+                </FrameLayout>
 
             </FrameLayout>
 

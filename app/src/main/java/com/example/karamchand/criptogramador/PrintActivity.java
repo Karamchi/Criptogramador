@@ -303,9 +303,14 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     //Podría evitar esto al restorear pero no cambia el tiempo.
     @Override
-    public void onFocusRequested(CellView cellView, float x, float y) {
-        ((FrameLayout) mEditText.getParent()).setX(x);
-        ((FrameLayout) mEditText.getParent()).setY(y);
+    public void onFocusRequested(CellView cellView) {
+
+        if (mCurrentInput != null)
+            mCurrentInput.setFocused(false, mEditText);
+        else
+            ((FrameLayout) mEditText.getParent()).removeView(mEditText);
+        cellView.setFocused(true, mEditText);
+        mEditText.requestFocus();
 
         if (mCurrentInput != null) {
             mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
