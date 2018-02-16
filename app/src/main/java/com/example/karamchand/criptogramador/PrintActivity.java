@@ -122,7 +122,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             public void onClick(View v) {
                 for (int i = 0; i < mLayout.getChildCount(); i++) {
                     if (mLayout.getChildAt(i) instanceof SolveWordView)
-                        ((SolveWordView) mLayout.getChildAt(i)).showDefinition();
+                        ((SolveWordView) mLayout.getChildAt(i)).showDefinition(false);
                 }
             }
         });

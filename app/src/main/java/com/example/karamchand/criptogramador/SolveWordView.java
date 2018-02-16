@@ -39,12 +39,6 @@ public class SolveWordView extends LinearLayout {
         TextView letter = ((TextView) findViewById(R.id.solve_word_view_letter));
         letter.setVisibility(VISIBLE);
         letter.setText(Character.toString(c));
-        letter.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleShowDefinition();
-            }
-        });
         return this;
     }
 
@@ -63,19 +57,21 @@ public class SolveWordView extends LinearLayout {
     @Override
     public void addView(View child) {
         ((LinearLayout) findViewById(R.id.solve_word_view_layout)).addView(child);
-        if (child instanceof CellView)
+        if (child instanceof CellView) {
             mChildren.add((CellView) child);
+            ((CellView) child).setParent(this);
+        }
     }
 
-    public void toggleShowDefinition() {
+    /*public void toggleShowDefinition() {
         if (mDefinition == null) return;
         if (mDefinition.getVisibility() == GONE) {
             if (mListener != null) mListener.onDefinitionShown(this);
             showDefinition();
-            getViewAt(0).performClick();
+//            getViewAt(0).performClick();
         }
         else hideDefinition();
-    }
+    }*/
 
     public void hideDefinition() {
         if (mDefinition == null) return;
@@ -83,8 +79,9 @@ public class SolveWordView extends LinearLayout {
         setBackgroundColor(Color.DKGRAY);
     }
 
-    public void showDefinition() {
+    public void showDefinition(boolean hideOthers) {
         if (mDefinition == null) return;
+        if (hideOthers) mListener.onDefinitionShown(this);
         mDefinition.setVisibility(VISIBLE);
         setBackgroundColor(Color.BLACK);
     }
@@ -92,7 +89,7 @@ public class SolveWordView extends LinearLayout {
     public void setDefinition(String s) {
         mDefinition = findViewById(R.id.solve_word_view_definition);
         mDefinition.setText(s);
-        showDefinition();
+        showDefinition(false);
     }
 
     public SolveWordView withListener(DefinitionShownListener l) {

@@ -16,6 +16,7 @@ public class CellView extends LinearLayout {
     private CellView mPrevious;
     private CellView mNext;
     private CellListener mListener;
+    private SolveWordView mParent;
 
     public CellView(Context context) {
         super(context);
@@ -100,6 +101,7 @@ public class CellView extends LinearLayout {
 
     public void requestCursor() {
         mListener.onFocusRequested(this);
+        mParent.showDefinition(true);
     }
 
     public String getInput() {
@@ -112,6 +114,10 @@ public class CellView extends LinearLayout {
             fl.addView(editText);
         else
             fl.removeView(editText);
+    }
+
+    public void setParent(SolveWordView solveWordView) {
+        mParent = solveWordView;
     }
 
     public interface CellListener extends OnClickListener {
