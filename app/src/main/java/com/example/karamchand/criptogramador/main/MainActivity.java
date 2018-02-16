@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.karamchand.criptogramador.FileUtils;
-import com.example.karamchand.criptogramador.LettersView;
 import com.example.karamchand.criptogramador.PhraseActivity;
 import com.example.karamchand.criptogramador.PrintActivity;
 import com.example.karamchand.criptogramador.R;

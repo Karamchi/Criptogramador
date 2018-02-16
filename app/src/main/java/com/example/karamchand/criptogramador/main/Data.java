@@ -1,6 +1,5 @@
 package com.example.karamchand.criptogramador.main;
 
-import com.example.karamchand.criptogramador.LettersView;
 import com.example.karamchand.criptogramador.PhraseActivity;
 
 import java.util.ArrayList;

@@ -80,7 +80,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"/>
 
-            <com.example.karamchand.criptogramador.LettersView
+            <com.example.karamchand.criptogramador.main.LettersView
                 android:id="@+id/letters_view"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

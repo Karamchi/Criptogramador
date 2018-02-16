@@ -30,6 +30,15 @@
         </FrameLayout>
 
         <TextView
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="4dp"
+            android:visibility="gone"
+            android:text="Hide all"/>
+
+        <TextView
             android:id="@+id/show_all"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -38,15 +47,6 @@
             android:padding="4dp"
             android:visibility="gone"
             android:src="@android:drawable/ic_menu_save"/>
-
-        <TextView
-            android:id="@+id/hide_all"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:padding="4dp"
-            android:visibility="gone"
-            android:text="Hide all"/>
 
         <ImageView
             android:id="@+id/save"

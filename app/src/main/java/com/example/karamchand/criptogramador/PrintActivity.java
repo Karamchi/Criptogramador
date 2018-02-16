@@ -19,8 +19,10 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import static com.example.karamchand.criptogramador.LettersView.ALPHABET;
+import static com.example.karamchand.criptogramador.main.LettersView.ALPHABET;
 
 public class PrintActivity extends AppCompatActivity implements FileUtils.LoadListener,
         CellView.CellListener, SolveWordView.DefinitionShownListener {
@@ -50,6 +52,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private CellView mCurrentInput;
     private boolean mFromUser;
     private int mSolution;
+    private Timer mTimer = new Timer();
+    private int mTime;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,7 +112,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 load();
             }
         });
-        findViewById(R.id.hide_all).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.timer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 for (int i = 0; i < mLayout.getChildCount(); i++) {
@@ -131,7 +135,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     private void restoreFromState() {
         findViewById(R.id.save).setVisibility(View.VISIBLE);
         findViewById(R.id.show_all).setVisibility(View.VISIBLE);
-        findViewById(R.id.hide_all).setVisibility(View.VISIBLE);
+        findViewById(R.id.timer).setVisibility(View.VISIBLE);
         mLastAdded = null;
         mEditText.setVisibility(View.GONE);
         mCells = new HashMap<>();
@@ -159,6 +163,29 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         }
         mLastAdded.setNext(mLastAdded);
         mLayout.addView(mLastRow);
+        restartTimer();
+    }
+
+    private void restartTimer() {
+        mTime = 0;
+        resumeTimer();
+    }
+
+    private void resumeTimer() {
+        mTimer.cancel();
+        mTimer = new Timer();
+        mTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                mTime++;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((TextView) findViewById(R.id.timer)).setText(Integer.toString(mTime));
+                    }
+                });
+            }
+        }, 0, 1000);
     }
 
     private void addCell(char c, int i) {
@@ -362,9 +389,10 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         for (String line : dumpInput())
             solution += line;
         solution = solution.replaceAll("[^A-ZÑ]", "").toLowerCase();
-        if (solution.hashCode() == mSolution)
+        if (solution.hashCode() == mSolution) {
             ((TextView) findViewById(R.id.title)).setText("SOLVED");
-        else
+            mTimer.cancel();
+        } else
             ((TextView) findViewById(R.id.title)).setText(mFileId);
     }
 
@@ -380,5 +408,17 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             if (mLayout.getChildAt(i) instanceof SolveWordView)
                 ((SolveWordView) mLayout.getChildAt(i)).hideDefinition();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mTimer.cancel();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        resumeTimer();
     }
 }

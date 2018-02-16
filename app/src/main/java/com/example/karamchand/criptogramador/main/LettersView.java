@@ -1,13 +1,9 @@
-package com.example.karamchand.criptogramador;
+package com.example.karamchand.criptogramador.main;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
-
-import com.example.karamchand.criptogramador.main.Data;
-import com.example.karamchand.criptogramador.main.FloatRowView;
-import com.example.karamchand.criptogramador.main.RowView;
 
 import java.util.HashMap;
 
