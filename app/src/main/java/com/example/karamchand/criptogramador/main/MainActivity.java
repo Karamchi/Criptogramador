@@ -163,7 +163,6 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         mRestoring = false;
         mLettersView.update(new Data(mState));
         mLettersView.setTotalWords(mState.size());
-        onWordUnfocused(0);
     }
 
     @Override
@@ -202,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         if (mState.size() > 0)
             setPhrase(mState.remove(0));
         restoreFromState();
+        onWordUnfocused(0);
 
         //Si el intent viene con author, lo seteamos y tiramos todo
         //Si no, restoreamos sharedpreferences
