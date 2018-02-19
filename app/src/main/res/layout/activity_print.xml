@@ -30,14 +30,21 @@
         </FrameLayout>
 
         <TextView
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="4dp"
+            android:visibility="gone"/>
+
+        <TextView
             android:id="@+id/show_all"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="Show All"
             android:padding="4dp"
-            android:visibility="gone"
-            android:src="@android:drawable/ic_menu_save"/>
+            android:visibility="gone"/>
 
     </LinearLayout>
 
