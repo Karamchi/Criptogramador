@@ -97,24 +97,10 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             @Override
             public void afterTextChanged(Editable s) {}
         });
-        new HttpAsyncTask("https://gist.githubusercontent.com/Karamchi/208810ea17178a81dba5c039942cbd6d/raw/18",
-                new HttpAsyncTask.HTTPListener() {
-                    @Override
-                    public void onResponseSuccessful(ArrayList<String> result) {
-                    }
-
-                    @Override
-                    public void onResponseFailure(int statusCode) {
-                    }
-
-                    @Override
-                    public void onFailure() {
-                    }
-                }).execute(HttpAsyncTask.GET);
     }
 
     private void setupToolbar() {
-        findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
+        /*findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 save(true);
@@ -125,7 +111,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             public void onClick(View view) {
                 load();
             }
-        });
+        });*/
         findViewById(R.id.timer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,7 +133,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     private void restoreFromState() {
-        findViewById(R.id.save).setVisibility(View.VISIBLE);
+//        findViewById(R.id.save).setVisibility(View.VISIBLE);
         findViewById(R.id.show_all).setVisibility(View.VISIBLE);
         findViewById(R.id.timer).setVisibility(View.VISIBLE);
         mLastAdded = null;
@@ -242,10 +228,10 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         content.addAll(mDefinitions);
 
         if (showToast) {
-            FileUtils.save(this, PATH, mFileId, content);
+            FileUtils.save(this, RootActivity.PATH, mFileId, content);
             Toast.makeText(this, "File written to " + mFileId, Toast.LENGTH_SHORT).show();
         } else {
-            FileUtils.save(this, PATH, "temp", content);
+            FileUtils.save(this, RootActivity.PATH, "temp", content);
         }
     }
 
@@ -292,12 +278,13 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     private void load() {
-        FileUtils.load(this, this, PATH);
+        onLoad(FileUtils.readFromFile(RootActivity.PATH, getIntent().getStringExtra("filename")),
+                getIntent().getStringExtra("filename"));
     }
 
     @Override
     public void onLoad(ArrayList<String> contents, String filename) {
-        mFileId = filename.substring(0, 8);
+        mFileId = filename.substring(0, Math.min(8, filename.length()));
         ((TextView) findViewById(R.id.title)).setText(mFileId);
         mCellLetters = new ArrayList<>();
         mCellNumbers = new ArrayList<>();

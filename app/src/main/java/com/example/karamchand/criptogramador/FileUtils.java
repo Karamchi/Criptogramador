@@ -88,6 +88,10 @@ public class FileUtils {
         return result;
     }
 
+    public static boolean exists(String path, String filename) {
+        return new File(ROOT + path + "/" + filename).exists();
+    }
+
     public interface LoadListener {
         void onLoad(ArrayList<String> s, String filename);
     }
