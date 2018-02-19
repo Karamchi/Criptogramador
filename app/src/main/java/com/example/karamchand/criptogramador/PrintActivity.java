@@ -71,6 +71,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             mPunctuation = g.mPunctuation;
             mFileId = g.mFileId;
             mSolution = g.mSolution;
+            findViewById(R.id.save).setVisibility(View.VISIBLE);
             restoreFromState();
         } else {
             load();
@@ -100,13 +101,13 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     private void setupToolbar() {
-        /*findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 save(true);
             }
         });
-        findViewById(R.id.load).setOnClickListener(new View.OnClickListener() {
+        /*findViewById(R.id.load).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 load();
