@@ -97,6 +97,20 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             @Override
             public void afterTextChanged(Editable s) {}
         });
+        new HttpAsyncTask("https://gist.githubusercontent.com/Karamchi/208810ea17178a81dba5c039942cbd6d/raw/18",
+                new HttpAsyncTask.HTTPListener() {
+                    @Override
+                    public void onResponseSuccessful(ArrayList<String> result) {
+                    }
+
+                    @Override
+                    public void onResponseFailure(int statusCode) {
+                    }
+
+                    @Override
+                    public void onFailure() {
+                    }
+                }).execute(HttpAsyncTask.GET);
     }
 
     private void setupToolbar() {
