@@ -24,12 +24,12 @@ import java.util.TimerTask;
 
 import static com.example.karamchand.criptogramador.main.LettersView.ALPHABET;
 
-public class PrintActivity extends AppCompatActivity implements FileUtils.LoadListener,
-        CellView.CellListener, SolveWordView.DefinitionShownListener {
+public class PrintActivity extends AppCompatActivity implements CellView.CellListener,
+        SolveWordView.DefinitionShownListener {
 
     private static final String PATH = "/finished";
     private static final int ROW_WIDTH = 10;
-    private String mFileId;
+    private String mTitle;
 
     //The numbers that correspond to word i char j
     private ArrayList<ArrayList<Integer>> mLettersState = new ArrayList<>();
@@ -69,12 +69,13 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             mCellLetters = g.mCellLetters;
             mCellNumbers = g.mCellNumbers;
             mPunctuation = g.mPunctuation;
-            mFileId = g.mFileId;
+            mTitle = g.mFileId;
             mSolution = g.mSolution;
             findViewById(R.id.save).setVisibility(View.VISIBLE);
             restoreFromState();
         } else {
-            load();
+            load(FileUtils.readFromFile(RootActivity.PATH, getIntent().getStringExtra("filename")),
+                    getIntent().getStringExtra("title"));
         }
         setupToolbar();
         mEditText.addTextChangedListener(new TextWatcher() {
@@ -107,12 +108,6 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
                 save(true);
             }
         });
-        /*findViewById(R.id.load).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                load();
-            }
-        });*/
         findViewById(R.id.timer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,7 +129,6 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     private void restoreFromState() {
-//        findViewById(R.id.save).setVisibility(View.VISIBLE);
         findViewById(R.id.show_all).setVisibility(View.VISIBLE);
         findViewById(R.id.timer).setVisibility(View.VISIBLE);
         mLastAdded = null;
@@ -229,8 +223,8 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         content.addAll(mDefinitions);
 
         if (showToast) {
-            FileUtils.save(this, RootActivity.PATH, mFileId, content);
-            Toast.makeText(this, "File written to " + mFileId, Toast.LENGTH_SHORT).show();
+            FileUtils.save(this, PATH, mTitle, content);
+            Toast.makeText(this, "File written to " + mTitle, Toast.LENGTH_SHORT).show();
         } else {
             FileUtils.save(this, RootActivity.PATH, "temp", content);
         }
@@ -278,15 +272,9 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         return result;
     }
 
-    private void load() {
-        onLoad(FileUtils.readFromFile(RootActivity.PATH, getIntent().getStringExtra("filename")),
-                getIntent().getStringExtra("filename"));
-    }
-
-    @Override
-    public void onLoad(ArrayList<String> contents, String filename) {
-        mFileId = filename.substring(0, Math.min(8, filename.length())).replace(".txt", "");
-        ((TextView) findViewById(R.id.title)).setText(mFileId);
+    private void load(ArrayList<String> contents, String title) {
+        mTitle = title;
+        ((TextView) findViewById(R.id.title)).setText(mTitle);
         mCellLetters = new ArrayList<>();
         mCellNumbers = new ArrayList<>();
         mLettersState = new ArrayList<>();
@@ -323,6 +311,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         long t = System.currentTimeMillis();
         restoreFromState();
         Log.e("Time to restore", Long.toString(System.currentTimeMillis() - t));
+        mTime = getIntent().getIntExtra("time", 0);
     }
 
     private void loadPhraseLine(String[] topRow, String[] bottomRow) {
@@ -345,7 +334,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_DEL && mEditText.getSelectionStart() == 0) {
+        if (keyCode == KeyEvent.KEYCODE_DEL && mEditText.getSelectionStart() == 0 && mEditText.isEnabled()) {
             mCurrentInput.setInput("", false);
             mEditText.setSelection(Math.min(mEditText.length(), 1));
             return true;
@@ -377,8 +366,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     @Override
     public void onClick(View v) {
-        if (v instanceof CellView) {
-//            mEditText.setEnabled(true);
+        if (v instanceof CellView && mEditText.isEnabled()) {
             mEditText.setVisibility(View.VISIBLE);
             mEditText.requestFocus();
             ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(mEditText, 0);
@@ -392,15 +380,23 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
             solution += line;
         solution = solution.replaceAll("[^A-ZÑ]", "").toLowerCase();
         if (solution.hashCode() == mSolution) {
-            ((TextView) findViewById(R.id.title)).setText("SOLVED");
+            ((TextView) findViewById(R.id.title)).setText(mTitle + " - SOLVED");
             mTimer.cancel();
-        } else
-            ((TextView) findViewById(R.id.title)).setText(mFileId);
+            if (!ProfileUtils.getProfile().containsKey(mTitle))
+                ProfileUtils.putInProfile(this, mTitle, Integer.toString(mTime));
+            mEditText.setEnabled(false);
+            mEditText.setVisibility(View.GONE);
+            if (mCurrentInput != null) {
+                mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
+                mCurrentInput.showInput(true);
+            }
+        }
     }
 
     @Override
     protected void onStop() {
         save(false);
+        ProfileUtils.putInProfile(this, "current", mTitle + ":" + Integer.toString(mTime));
         super.onStop();
     }
 
@@ -422,5 +418,6 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
     protected void onResume() {
         super.onResume();
         resumeTimer();
+        checkForSolution();
     }
 }

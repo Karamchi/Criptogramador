@@ -2,6 +2,7 @@ package com.example.karamchand.criptogramador;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -37,9 +38,12 @@ public class RootActivity extends AppCompatActivity {
         mResumeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!FileUtils.exists(PATH, "temp.txt")) return;
+                if (!canResume()) return;
                 Intent intent = new Intent(RootActivity.this, PrintActivity.class);
                 intent.putExtra("filename", "temp.txt");
+                String[] current = ProfileUtils.getProfile().get("current").split(":");
+                intent.putExtra("title", current[0]);
+                intent.putExtra("time", Integer.parseInt(current[1]));
                 startActivity(intent);
             }
         });
@@ -54,7 +58,8 @@ public class RootActivity extends AppCompatActivity {
                     @Override
                     public void onResponseSuccessful(ArrayList<String> result) {
                         ((LinearLayout) findViewById(R.id.root_activity_layout)).removeAllViews();
-                        ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(mResumeButton);
+                        if (canResume())
+                            ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(mResumeButton);
                         for (String s : result) {
                             ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(getButton(s));
                             refreshFile(s);
@@ -68,7 +73,8 @@ public class RootActivity extends AppCompatActivity {
                     @Override
                     public void onFailure() {
                         ((LinearLayout) findViewById(R.id.root_activity_layout)).removeAllViews();
-                        ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(mResumeButton);
+                        if (canResume())
+                            ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(mResumeButton);
                         for (String s : FileUtils.getDirList(RootActivity.this, PATH)) {
                             s = s.replace(".txt", "");
                             if (s.equals("temp")) continue;
@@ -77,6 +83,10 @@ public class RootActivity extends AppCompatActivity {
                         }
                     }
                 }).execute(HttpAsyncTask.GET);
+    }
+
+    private boolean canResume() {
+        return FileUtils.exists(PATH, "temp.txt");
     }
 
     private void refreshFile(final String s) {
@@ -101,16 +111,26 @@ public class RootActivity extends AppCompatActivity {
         Button b = new Button(this);
         b.setLayoutParams(new ViewGroup.LayoutParams(-2, -2));
         b.setText(s);
+        if (ProfileUtils.getProfile().containsKey(s)) {
+            b.setTextColor(Color.GREEN);
+            b.setText(s + "\n" + "Solved in " +
+                    ProfileUtils.getProfile().get("current").split(":")[1] + "s");
+        }
+
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!FileUtils.exists(PATH, s + ".txt")) return;
+                if (!canResume()) {
+                    startPuzzle(s);
+                    return;
+                }
                 new AlertDialog.Builder(RootActivity.this)
                         .setTitle("Progress on current puzzle will be lost")
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                startPuzzle(s + ".txt");
+                                startPuzzle(s);
                             }
                         })
                         .setNegativeButton("back", new DialogInterface.OnClickListener() {
@@ -128,7 +148,8 @@ public class RootActivity extends AppCompatActivity {
 
     private void startPuzzle(String s) {
         Intent intent = new Intent(RootActivity.this, PrintActivity.class);
-        intent.putExtra("filename", s);
+        intent.putExtra("filename", s + ".txt");
+        intent.putExtra("title", s);
         startActivity(intent);
     }
 

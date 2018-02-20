@@ -23,6 +23,8 @@ import java.util.Deque;
 
 public class MainActivity extends AppCompatActivity implements WordsView.OnWordChangedListener, FileUtils.LoadListener {
 
+    private static final String PATH = "/builder";
+
     private LettersView mLettersView;
     private WordsView mWordsView;
     private ArrayList<String> mState = new ArrayList<>();
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     }
 
     private void load() {
-        FileUtils.load(this, this, "");
+        FileUtils.load(this, this, PATH);
     }
 
     @Override
@@ -118,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         content.add(0, mPhrase.getText().toString());
         String filename = FileUtils.saveWithTimeStamp(this,
                 mPhrase.getText().subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_"),
-                "",
+                PATH,
                 content);
         Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
     }
@@ -126,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     private void save(String filename) {
         ArrayList<String> content = (ArrayList<String>) mState.clone();
         content.add(0, mPhrase.getText().toString());
-        FileUtils.save(this, "", filename, content);
+        FileUtils.save(this, PATH, filename, content);
     }
 
     private void setTitleAuthor(String s) {
@@ -198,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     protected void onStart() {
         super.onStart();
 
-        mState = FileUtils.readFromFile("", "temp.txt");
+        mState = FileUtils.readFromFile(PATH, "temp.txt");
         if (mState.size() > 0)
             setPhrase(mState.remove(0));
         restoreFromState();

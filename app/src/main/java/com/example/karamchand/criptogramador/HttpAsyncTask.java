@@ -24,6 +24,7 @@ class HttpAsyncTask extends AsyncTask<String, Object, ArrayList<String>> {
             URL url = new URL(mUrlString);
             HttpURLConnection urlConnection = (HttpURLConnection) (url.openConnection());
             urlConnection.setRequestMethod(method[0]);
+            urlConnection.setConnectTimeout(1000);
             urlConnection.connect();
             Log.i("Http request", method[0]);
             Log.i("Http request", mUrlString);
