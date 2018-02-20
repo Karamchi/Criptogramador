@@ -41,7 +41,6 @@ class HttpAsyncTask extends AsyncTask<String, Object, ArrayList<String>> {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            mListener.onFailure();
             return null;
         }
     }
@@ -50,6 +49,8 @@ class HttpAsyncTask extends AsyncTask<String, Object, ArrayList<String>> {
     public void onPostExecute(ArrayList<String> result) {
         if (result != null)
             mListener.onResponseSuccessful(result);
+        else
+            mListener.onFailure();
     }
 
     interface HTTPListener {

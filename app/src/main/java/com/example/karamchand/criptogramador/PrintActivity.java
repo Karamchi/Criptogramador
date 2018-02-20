@@ -178,15 +178,15 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                mTime++;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         ((TextView) findViewById(R.id.timer)).setText(Integer.toString(mTime));
                     }
                 });
+                mTime++;
             }
-        }, 0, 1000);
+        }, 1000, 1000);
     }
 
     private void addCell(char c, int i) {
@@ -285,7 +285,7 @@ public class PrintActivity extends AppCompatActivity implements FileUtils.LoadLi
 
     @Override
     public void onLoad(ArrayList<String> contents, String filename) {
-        mFileId = filename.substring(0, Math.min(8, filename.length()));
+        mFileId = filename.substring(0, Math.min(8, filename.length())).replace(".txt", "");
         ((TextView) findViewById(R.id.title)).setText(mFileId);
         mCellLetters = new ArrayList<>();
         mCellNumbers = new ArrayList<>();

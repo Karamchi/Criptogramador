@@ -55,11 +55,15 @@ public class FileUtils {
         }
     }
 
-    public static void load(Activity context, final LoadListener listener, final String path) {
+    public static String[] getDirList(Activity context, final String path) {
         requestPermissions(context);
         final File dir = new File(ROOT + path);
         dir.mkdirs();
-        final String[] mFileList = dir.list();
+        return dir.list();
+    }
+
+    public static void load(Activity context, final LoadListener listener, final String path) {
+        final String[] mFileList = getDirList(context, path);
         if (mFileList == null) return;
         new AlertDialog.Builder(context)
                 .setTitle("Load file")

@@ -67,6 +67,14 @@ public class RootActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure() {
+                        ((LinearLayout) findViewById(R.id.root_activity_layout)).removeAllViews();
+                        ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(mResumeButton);
+                        for (String s : FileUtils.getDirList(RootActivity.this, PATH)) {
+                            s = s.replace(".txt", "");
+                            if (s.equals("temp")) continue;
+                            ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(getButton(s));
+                            refreshFile(s);
+                        }
                     }
                 }).execute(HttpAsyncTask.GET);
     }
