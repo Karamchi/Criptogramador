@@ -114,7 +114,7 @@ public class RootActivity extends AppCompatActivity {
         if (ProfileUtils.getProfile().containsKey(s)) {
             b.setTextColor(Color.GREEN);
             b.setText(s + "\n" + "Solved in " +
-                    ProfileUtils.getProfile().get("current").split(":")[1] + "s");
+                    ProfileUtils.getProfile().get(s) + "s");
         }
 
         b.setOnClickListener(new View.OnClickListener() {
