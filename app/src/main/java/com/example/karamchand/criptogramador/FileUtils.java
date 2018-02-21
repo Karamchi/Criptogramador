@@ -8,10 +8,13 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
@@ -52,11 +55,15 @@ public class FileUtils {
         }
     }
 
-    public static void load(Activity context, final LoadListener listener, final String path) {
+    public static String[] getDirList(Activity context, final String path) {
         requestPermissions(context);
         final File dir = new File(ROOT + path);
         dir.mkdirs();
-        final String[] mFileList = dir.list();
+        return dir.list();
+    }
+
+    public static void load(Activity context, final LoadListener listener, final String path) {
+        final String[] mFileList = getDirList(context, path);
         if (mFileList == null) return;
         new AlertDialog.Builder(context)
                 .setTitle("Load file")
@@ -85,6 +92,10 @@ public class FileUtils {
         return result;
     }
 
+    public static boolean exists(String path, String filename) {
+        return new File(ROOT + path + "/" + filename).exists();
+    }
+
     public interface LoadListener {
         void onLoad(ArrayList<String> s, String filename);
     }
@@ -111,5 +122,22 @@ public class FileUtils {
             if (context.getPackageManager().checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, context.getPackageName())
                     == PackageManager.PERMISSION_DENIED)
                 context.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1024);
+    }
+
+    public static ArrayList<String> streamToString(InputStream inputStream) {
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+        InputStreamReader streamReader = new InputStreamReader(bufferedInputStream);
+        BufferedReader buffer = new BufferedReader(streamReader);
+        ArrayList<String> data = new ArrayList();
+        try {
+            String chunk = buffer.readLine();
+            while (chunk != null) {
+                data.add(chunk);
+                chunk = buffer.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 }

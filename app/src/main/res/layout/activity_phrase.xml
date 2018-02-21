@@ -62,11 +62,4 @@
         android:layout_gravity="center"
         android:text="Resume"/>
 
-    <Button
-        android:id="@+id/button_gotosolve"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Solve existing"/>
-
 </LinearLayout>
