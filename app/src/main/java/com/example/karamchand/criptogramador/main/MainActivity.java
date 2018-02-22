@@ -31,10 +31,12 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     private EditText mPhrase;
     private boolean mRestoring;
     private Deque<ArrayList<String>> mHistory = new ArrayDeque<>();
+    private Intent mIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) mIntent = getIntent();
         setContentView(R.layout.activity_main);
         mWordsView = ((WordsView) findViewById(R.id.words_view));
         mWordsView.setOnWordChangedListener(this);
@@ -192,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     @Override
     protected void onStop() {
         save("temp");
+        mIntent = null;
         super.onStop();
     }
 
@@ -204,13 +207,14 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
             setPhrase(mState.remove(0));
         restoreFromState();
         onWordUnfocused(0);
+        if (mIntent == null) return;
 
         //Si el intent viene con author, lo seteamos y tiramos todo
         //Si no, restoreamos sharedpreferences
-        if (getIntent().hasExtra("title"))
-            setTitleAuthor(getIntent().getStringExtra("title"));
-        if (getIntent().hasExtra("phrase"))
-            setPhrase(getIntent().getStringExtra("phrase"));
+        if (mIntent.hasExtra("title"))
+            setTitleAuthor(mIntent.getStringExtra("title"));
+        if (mIntent.hasExtra("phrase"))
+            setPhrase(mIntent.getStringExtra("phrase"));
     }
 
 }

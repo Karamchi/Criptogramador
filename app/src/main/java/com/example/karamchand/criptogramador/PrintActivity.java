@@ -1,6 +1,7 @@
 package com.example.karamchand.criptogramador;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -54,16 +55,22 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
     private int mSolution;
     private Timer mTimer = new Timer();
     private int mTime;
+    private Intent mIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) mIntent = getIntent();
         setContentView(R.layout.activity_print);
         mLayout = (LinearLayout) findViewById(R.id.activity_print_layout);
         mEditText = ((EditText) findViewById(R.id.print_activity_edit_text));
-        if (getIntent().hasExtra("words")) {
-            Generator g = new Generator(getIntent().getStringExtra("phrase"),
-                    (ArrayList<String>) getIntent().getExtras().get("words"));
+        if (mIntent == null) {
+            String[] current = ProfileUtils.getProfile().get("current").split(":");
+            load(FileUtils.readFromFile(RootActivity.PATH, "temp.txt"), current[0]);
+            mTime = Integer.parseInt(current[1]);
+        } else if (mIntent.hasExtra("words")) {
+            Generator g = new Generator(mIntent.getStringExtra("phrase"),
+                    (ArrayList<String>) mIntent.getExtras().get("words"));
             g.generate();
             mLettersState = g.mLettersState;
             mCellLetters = g.mCellLetters;
@@ -74,8 +81,8 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
             findViewById(R.id.save).setVisibility(View.VISIBLE);
             restoreFromState();
         } else {
-            load(FileUtils.readFromFile(RootActivity.PATH, getIntent().getStringExtra("filename")),
-                    getIntent().getStringExtra("title"));
+            load(FileUtils.readFromFile(RootActivity.PATH, mIntent.getStringExtra("filename")),
+                    mIntent.getStringExtra("title"));
         }
         setupToolbar();
         mEditText.addTextChangedListener(new TextWatcher() {
@@ -311,7 +318,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         long t = System.currentTimeMillis();
         restoreFromState();
         Log.e("Time to restore", Long.toString(System.currentTimeMillis() - t));
-        mTime = getIntent().getIntExtra("time", 0);
+        if (mIntent != null) mTime = mIntent.getIntExtra("time", 0);
     }
 
     private void loadPhraseLine(String[] topRow, String[] bottomRow) {
@@ -397,6 +404,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
     protected void onStop() {
         save(false);
         ProfileUtils.putInProfile(this, "current", mTitle + ":" + Integer.toString(mTime));
+        mIntent = null;
         super.onStop();
     }
 
