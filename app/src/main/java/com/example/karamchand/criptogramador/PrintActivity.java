@@ -292,7 +292,8 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         for (i = 0; i < contents.size() - 1; i += 2) {
             String topRow = contents.get(i);
             String bottomRow = contents.get(i + 1);
-            if (!topRow.isEmpty() && ALPHABET.toUpperCase().contains(Character.toString(topRow.charAt(0)))) {
+            if (!topRow.isEmpty() && (ALPHABET.toUpperCase() + ALPHABET)
+                    .contains(Character.toString(topRow.charAt(0)))) {
                 readingWords = false;
             }
             if (readingWords) {
