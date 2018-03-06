@@ -141,9 +141,12 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         mLastAdded = null;
         mEditText.setVisibility(View.GONE);
         mCells = new HashMap<>();
+        String fullAlphabet = ALPHABET.toUpperCase() + ALPHABET;
+        if (!mCellLetters.contains('Ñ'))
+            fullAlphabet = fullAlphabet.replace("Ñ", "");
         for (int word = 0; word < mLettersState.size(); word++) {
             mLastRow = new SolveWordView(this)
-                    .withLetter((ALPHABET.toUpperCase() + ALPHABET).charAt(word))
+                    .withLetter(fullAlphabet.charAt(word))
                     .withListener(this);
             if (mDefinitions.size() > word)
                 mLastRow.setDefinition(mDefinitions.get(word));
