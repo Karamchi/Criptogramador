@@ -14,6 +14,8 @@ import android.widget.FrameLayout;
  */
 public class ZoomLayout extends FrameLayout implements ScaleGestureDetector.OnScaleGestureListener {
 
+    private ScaleGestureDetector scaleDetector;
+
     private enum Mode {
         NONE,
         DRAG,
@@ -54,54 +56,51 @@ public class ZoomLayout extends FrameLayout implements ScaleGestureDetector.OnSc
     }
 
     private void init(Context context) {
-        final ScaleGestureDetector scaleDetector = new ScaleGestureDetector(context, this);
-        setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
-                    case MotionEvent.ACTION_DOWN:
-                        Log.i(TAG, "DOWN");
-                        if (scale > MIN_ZOOM) {
-                            mode = Mode.DRAG;
-                            startX = motionEvent.getX() - prevDx;
-                            startY = motionEvent.getY() - prevDy;
-                        }
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        if (mode == Mode.DRAG) {
-                            dx = motionEvent.getX() - startX;
-                            dy = motionEvent.getY() - startY;
-                        }
-                        break;
-                    case MotionEvent.ACTION_POINTER_DOWN:
-                        mode = Mode.ZOOM;
-                        break;
-                    case MotionEvent.ACTION_POINTER_UP:
-                        mode = Mode.DRAG;
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        Log.i(TAG, "UP");
-                        mode = Mode.NONE;
-                        prevDx = dx;
-                        prevDy = dy;
-                        break;
-                }
-                scaleDetector.onTouchEvent(motionEvent);
+        scaleDetector = new ScaleGestureDetector(context, this);
+    }
 
-                if ((mode == Mode.DRAG && scale >= MIN_ZOOM) || mode == Mode.ZOOM) {
-                    getParent().requestDisallowInterceptTouchEvent(true);
-                    float maxDx = (child().getWidth() - (child().getWidth() / scale)) / 2 * scale;
-                    float maxDy = (child().getHeight() - (child().getHeight() / scale))/ 2 * scale;
-                    dx = Math.min(Math.max(dx, -maxDx), maxDx);
-                    dy = Math.min(Math.max(dy, -maxDy), maxDy);
-                    Log.i(TAG, "Width: " + child().getWidth() + ", scale " + scale + ", dx " + dx
-                            + ", max " + maxDx);
-                    applyScaleAndTranslation();
+    public boolean onTouch(MotionEvent motionEvent) {
+        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                Log.i(TAG, "DOWN");
+                if (scale > MIN_ZOOM) {
+                    mode = Mode.DRAG;
+                    startX = motionEvent.getX() - prevDx;
+                    startY = motionEvent.getY() - prevDy;
                 }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (mode == Mode.DRAG) {
+                    dx = motionEvent.getX() - startX;
+                    dy = motionEvent.getY() - startY;
+                }
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                mode = Mode.ZOOM;
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+                mode = Mode.DRAG;
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.i(TAG, "UP");
+                mode = Mode.NONE;
+                prevDx = dx;
+                prevDy = dy;
+                break;
+        }
+        scaleDetector.onTouchEvent(motionEvent);
 
-                return true;
-            }
-        });
+        if ((mode == Mode.DRAG && scale >= MIN_ZOOM) || mode == Mode.ZOOM) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+            float maxDx = (child().getWidth() - (child().getWidth() / scale)) / 2 * scale;
+            float maxDy = (child().getHeight() - (child().getHeight() / scale))/ 2 * scale;
+            dx = Math.min(Math.max(dx, -maxDx), maxDx);
+            dy = Math.min(Math.max(dy, -maxDy), maxDy);
+            Log.i(TAG, "Width: " + child().getWidth() + ", scale " + scale + ", dx " + dx
+                    + ", max " + maxDx);
+            applyScaleAndTranslation();
+        }
+        return true;
     }
 
     // ScaleGestureDetector
@@ -143,9 +142,8 @@ public class ZoomLayout extends FrameLayout implements ScaleGestureDetector.OnSc
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        onTouchEvent(ev);
-        return true;
-//        return super.onInterceptTouchEvent(ev);
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        onTouch(ev);
+        return super.dispatchTouchEvent(ev);
     }
 }
