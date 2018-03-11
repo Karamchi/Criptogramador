@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static com.example.karamchand.criptogramador.main.LettersView.ALPHABET;
+import static com.example.karamchand.criptogramador.builder.LettersView.ALPHABET;
 
 public class Generator {
 

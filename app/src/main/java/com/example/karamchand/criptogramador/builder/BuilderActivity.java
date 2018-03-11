@@ -1,4 +1,4 @@
-package com.example.karamchand.criptogramador.main;
+package com.example.karamchand.criptogramador.builder;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.example.karamchand.criptogramador.FileUtils;
 import com.example.karamchand.criptogramador.PhraseActivity;
-import com.example.karamchand.criptogramador.PrintActivity;
 import com.example.karamchand.criptogramador.R;
 import com.example.karamchand.criptogramador.SearchActivity;
 
@@ -21,7 +20,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 
-public class MainActivity extends AppCompatActivity implements WordsView.OnWordChangedListener, FileUtils.LoadListener {
+public class BuilderActivity extends AppCompatActivity implements WordsView.OnWordChangedListener, FileUtils.LoadListener {
 
     private static final String PATH = "/builder";
 
@@ -37,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) mIntent = getIntent();
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_builder);
         mWordsView = ((WordsView) findViewById(R.id.words_view));
         mWordsView.setOnWordChangedListener(this);
         mLettersView = (LettersView) findViewById(R.id.letters_view);
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         findViewById(R.id.go_to_search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, SearchActivity.class));
+                startActivity(new Intent(BuilderActivity.this, SearchActivity.class));
             }
         });
         findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
@@ -96,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         findViewById(R.id.finish).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, PrintActivity.class);
+                Intent intent = new Intent(BuilderActivity.this, com.example.karamchand.criptogramador.MainActivity.class);
                 intent.putExtra("phrase", mPhrase.getText().toString());
                 intent.putExtra("words", mState);
                 startActivity(intent);

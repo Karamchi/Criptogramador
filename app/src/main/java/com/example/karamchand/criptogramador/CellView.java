@@ -1,11 +1,9 @@
 package com.example.karamchand.criptogramador;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -27,7 +25,7 @@ public class CellView extends LinearLayout {
     public CellView(Context context) {
         super(context);
         mSize = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE))
-                .getDefaultDisplay().getWidth() / PrintActivity.ROW_WIDTH;
+                .getDefaultDisplay().getWidth() / MainActivity.ROW_WIDTH;
         init();
     }
 

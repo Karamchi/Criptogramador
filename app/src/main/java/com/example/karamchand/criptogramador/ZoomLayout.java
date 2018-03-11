@@ -1,4 +1,4 @@
-package com.example.karamchand.criptogramador.main;
+package com.example.karamchand.criptogramador;
 
 import android.content.Context;
 import android.util.AttributeSet;

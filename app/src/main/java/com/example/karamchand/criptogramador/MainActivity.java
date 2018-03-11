@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.example.karamchand.criptogramador.main.LettersView.ALPHABET;
+import static com.example.karamchand.criptogramador.builder.LettersView.ALPHABET;
 
-public class PrintActivity extends AppCompatActivity implements CellView.CellListener,
+public class MainActivity extends AppCompatActivity implements CellView.CellListener,
         SolveWordView.DefinitionShownListener {
 
     private static final String PATH = "/finished";
@@ -61,7 +61,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) mIntent = getIntent();
-        setContentView(R.layout.activity_print);
+        setContentView(R.layout.activity_main);
         mLayout = (LinearLayout) findViewById(R.id.activity_print_layout);
         mEditText = ((EditText) findViewById(R.id.print_activity_edit_text));
         if (mIntent == null) {

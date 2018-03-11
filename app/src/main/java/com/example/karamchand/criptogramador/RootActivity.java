@@ -44,7 +44,7 @@ public class RootActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!canResume()) return;
-                Intent intent = new Intent(RootActivity.this, PrintActivity.class);
+                Intent intent = new Intent(RootActivity.this, MainActivity.class);
                 intent.putExtra("filename", "temp.txt");
                 String[] current = ProfileUtils.getProfile().get("current").split(":");
                 intent.putExtra("title", current[0]);
@@ -167,7 +167,7 @@ public class RootActivity extends AppCompatActivity {
     }
 
     private void startPuzzle(String s) {
-        Intent intent = new Intent(RootActivity.this, PrintActivity.class);
+        Intent intent = new Intent(RootActivity.this, MainActivity.class);
         intent.putExtra("filename", s + ".txt");
         intent.putExtra("title", s);
         startActivity(intent);

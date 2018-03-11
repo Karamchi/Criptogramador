@@ -1,4 +1,4 @@
-package com.example.karamchand.criptogramador.main;
+package com.example.karamchand.criptogramador.builder;
 
 import com.example.karamchand.criptogramador.PhraseActivity;
 

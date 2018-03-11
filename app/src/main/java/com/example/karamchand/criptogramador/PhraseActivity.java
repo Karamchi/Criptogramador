@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.karamchand.criptogramador.main.MainActivity;
+import com.example.karamchand.criptogramador.builder.BuilderActivity;
 
 public class PhraseActivity extends AppCompatActivity {
 
@@ -46,7 +46,7 @@ public class PhraseActivity extends AppCompatActivity {
         findViewById(R.id.button_resume).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(PhraseActivity.this, MainActivity.class));
+                startActivity(new Intent(PhraseActivity.this, BuilderActivity.class));
             }
         });
         ((TextView) findViewById(R.id.phrase)).addTextChangedListener(getTextWatcher());
@@ -93,7 +93,7 @@ public class PhraseActivity extends AppCompatActivity {
     }
 
     public void reset() {
-        Intent intent = new Intent(PhraseActivity.this, MainActivity.class);
+        Intent intent = new Intent(PhraseActivity.this, BuilderActivity.class);
         String phrase = ((EditText) findViewById(R.id.phrase)).getText().toString();
         intent.putExtra("phrase", phrase.replace("\n", ""));
         intent.putExtra("title", ((EditText) findViewById(R.id.title)).getText().toString());

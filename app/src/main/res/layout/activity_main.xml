@@ -1,95 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="30dp"
+        android:background="@android:color/black">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:background="@android:color/black">
-
-            <ImageView
-                android:id="@+id/reset"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:src="@android:drawable/ic_menu_close_clear_cancel"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="11"/>
-
-            <ImageView
-                android:id="@+id/finish"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:visibility="gone"
-                android:src="@drawable/arrow_right"/>
-
-            <ImageView
-                android:id="@+id/save"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:src="@android:drawable/ic_menu_save"/>
-
-            <ImageView
-                android:id="@+id/load"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:src="@drawable/ic_menu_archive"/>
-
-            <ImageView
-                android:id="@+id/go_to_search"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:src="@android:drawable/ic_menu_search"/>
-
-        </LinearLayout>
-
-        <EditText
-            android:id="@+id/phrase"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:textColor="#bebebe"
-            android:background="@android:color/transparent"
-            android:maxLength="300"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <FrameLayout
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:paddingBottom="4dp">
+            android:layout_weight="1">
 
-            <com.example.karamchand.criptogramador.main.WordsView
-                android:id="@+id/words_view"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:gravity="center"/>
 
-            <com.example.karamchand.criptogramador.main.LettersView
-                android:id="@+id/letters_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1.35"/>
+        </FrameLayout>
 
+        <TextView
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="4dp"
+            android:visibility="gone"/>
 
-        </LinearLayout>
+        <TextView
+            android:id="@+id/show_all"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Show All"
+            android:padding="4dp"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:visibility="gone"
+            android:src="@android:drawable/ic_menu_save"/>
 
     </LinearLayout>
 
-</ScrollView>
+    <com.example.karamchand.criptogramador.ZoomLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/activity_print_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+                <FrameLayout
+                    android:layout_width="45dp"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/print_activity_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:paddingLeft="2dp"
+                        android:paddingRight="2dp"
+                        android:textColor="@android:color/black"
+                        android:visibility="gone"
+                        android:textSize="15dp"
+                        android:digits="@string/alphabet"
+                        android:background="@android:color/transparent"/>
+
+                </FrameLayout>
+
+            </FrameLayout>
+
+        </ScrollView>
+
+    </com.example.karamchand.criptogramador.ZoomLayout>
+
+</LinearLayout>
