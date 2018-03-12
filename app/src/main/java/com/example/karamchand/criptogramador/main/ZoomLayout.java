@@ -15,6 +15,8 @@ import android.widget.FrameLayout;
 public class ZoomLayout extends FrameLayout implements ScaleGestureDetector.OnScaleGestureListener {
 
     private ScaleGestureDetector scaleDetector;
+    private boolean hasPointerEvent;
+    private float lastTranslationY;
 
     private enum Mode {
         NONE,
@@ -60,7 +62,7 @@ public class ZoomLayout extends FrameLayout implements ScaleGestureDetector.OnSc
     }
 
     public boolean onTouch(MotionEvent motionEvent) {
-        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+        switch (motionEvent.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 Log.i(TAG, "DOWN");
                 if (scale > MIN_ZOOM) {
@@ -144,6 +146,23 @@ public class ZoomLayout extends FrameLayout implements ScaleGestureDetector.OnSc
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         onTouch(ev);
+
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            hasPointerEvent = false;
+            lastTranslationY = child().getTranslationY();
+        }
+
+        hasPointerEvent |= ev.getActionMasked() == MotionEvent.ACTION_POINTER_UP;
+
+        if (ev.getAction() == MotionEvent.ACTION_UP || ev.getActionMasked() == MotionEvent.ACTION_POINTER_UP) {
+            if (Math.abs(lastTranslationY - child().getTranslationY()) > 9) {
+                return true;
+            }
+            if (hasPointerEvent)
+                return true;
+            return super.dispatchTouchEvent(ev);
+        }
         return super.dispatchTouchEvent(ev);
     }
+
 }
