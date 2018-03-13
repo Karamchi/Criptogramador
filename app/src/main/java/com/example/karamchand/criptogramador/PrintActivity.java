@@ -95,8 +95,6 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
                     mFromUser = true;
                     return;
                 }
-                if (before == 1 && count == 0 && android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M)
-                    return; // Api < 23 va a llamar a onkeydown
                 boolean b = mEditText.getSelectionStart() > 1;
                 mCurrentInput.setInput(s.toString(), b);
                 if (b || s.length() == 0) mEditText.setSelection(Math.min(mEditText.length(), 1));
@@ -344,13 +342,14 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         return ' ';
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_DEL && mEditText.getSelectionStart() == 0 && mEditText.isEnabled()) {
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_DEL && mEditText.getSelectionStart() == 0 && mEditText.isEnabled()) {
             mCurrentInput.setInput("", false);
             mEditText.setSelection(Math.min(mEditText.length(), 1));
             return true;
         }
-        return super.onKeyDown(keyCode, event);
+        return super.dispatchKeyEvent(event);
     }
 
     //Podría evitar esto al restorear pero no cambia el tiempo.
