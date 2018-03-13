@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:background="@android:color/black">
 
         <FrameLayout
@@ -19,6 +19,7 @@
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:textSize="@dimen/toolbar_text_size"
                 android:gravity="center"/>
 
         </FrameLayout>
@@ -29,6 +30,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:padding="4dp"
+            android:textSize="@dimen/toolbar_text_size"
             android:visibility="gone"/>
 
         <TextView
@@ -38,6 +40,7 @@
             android:gravity="center"
             android:text="Show All"
             android:padding="4dp"
+            android:textSize="@dimen/toolbar_text_size"
             android:visibility="gone"/>
 
         <ImageView
@@ -81,7 +84,7 @@
                         android:paddingRight="2dp"
                         android:textColor="@android:color/black"
                         android:visibility="gone"
-                        android:textSize="15dp"
+                        android:textSize="@dimen/cell_input_size"
                         android:digits="@string/alphabet"
                         android:background="@android:color/transparent"/>
 

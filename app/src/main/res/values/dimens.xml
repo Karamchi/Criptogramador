@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="toolbar_text_size">14sp</dimen>
+    <dimen name="cell_text_size">11dp</dimen>
+    <dimen name="cell_input_size">15dp</dimen>
+</resources>

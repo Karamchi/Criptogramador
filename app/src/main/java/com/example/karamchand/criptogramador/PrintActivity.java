@@ -364,7 +364,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         mEditText.requestFocus();
 
         if (mCurrentInput != null) {
-            mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
+            mCurrentInput.setBackground(getResources().getDrawable(R.drawable.stroke));
             mCurrentInput.showInput(true);
         }
         cellView.setBackgroundColor(Color.LTGRAY);
@@ -397,7 +397,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
             mEditText.setEnabled(false);
             mEditText.setVisibility(View.GONE);
             if (mCurrentInput != null) {
-                mCurrentInput.setBackground(getDrawable(R.drawable.stroke));
+                mCurrentInput.setBackground(getResources().getDrawable(R.drawable.stroke));
                 mCurrentInput.showInput(true);
             }
         }

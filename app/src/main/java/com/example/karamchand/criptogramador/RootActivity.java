@@ -40,6 +40,7 @@ public class RootActivity extends AppCompatActivity {
         mResumeButton = new Button(this);
         mResumeButton.setLayoutParams(new ViewGroup.LayoutParams(-2, -2));
         mResumeButton.setText("Resume");
+        mResumeButton.setAllCaps(true);
         mResumeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
