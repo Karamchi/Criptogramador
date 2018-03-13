@@ -29,7 +29,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         SolveWordView.DefinitionShownListener {
 
     private static final String PATH = "/finished";
-    private static final int ROW_WIDTH = 10;
+    public static final int ROW_WIDTH = 10;
     private String mTitle;
 
     //The numbers that correspond to word i char j
