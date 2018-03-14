@@ -13,6 +13,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.TreeSet;
 
 public class RootActivity extends AppCompatActivity {
 
@@ -57,13 +62,9 @@ public class RootActivity extends AppCompatActivity {
                 new HttpAsyncTask.HTTPListener() {
                     @Override
                     public void onResponseSuccessful(ArrayList<String> result) {
-                        ((LinearLayout) findViewById(R.id.root_activity_layout)).removeAllViews();
-                        if (canResume())
-                            ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(mResumeButton);
-                        for (String s : result) {
-                            ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(getButton(s));
+                        for (String s : result)
                             refreshFile(s);
-                        }
+                        onResponse(result);
                     }
 
                     @Override
@@ -72,17 +73,36 @@ public class RootActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure() {
-                        ((LinearLayout) findViewById(R.id.root_activity_layout)).removeAllViews();
-                        if (canResume())
-                            ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(mResumeButton);
-                        for (String s : FileUtils.getDirList(RootActivity.this, PATH)) {
-                            s = s.replace(".txt", "");
-                            if (s.equals("temp")) continue;
-                            ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(getButton(s));
-                            refreshFile(s);
-                        }
+                        onResponse(null);
                     }
                 }).execute(HttpAsyncTask.GET);
+    }
+
+    private void onResponse(ArrayList<String> result) {
+        ((LinearLayout) findViewById(R.id.root_activity_layout)).removeAllViews();
+        if (canResume())
+            ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(mResumeButton);
+        TreeSet<String> set = new TreeSet<>(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                try {
+                    int int1 = Integer.parseInt(o1);
+                    int int2 = Integer.parseInt(o2);
+                    return (int) Math.signum(int1 - int2);
+                } catch (Exception e) {
+                    return o1.compareTo(o2);
+                }
+            }
+        });
+        String[] list = FileUtils.getDirList(this, PATH);
+        for (int i = 0; i < list.length; i++) list[i] = list[i].replace(".txt", "");
+        set.addAll(Arrays.asList(list));
+        if (result != null) set.addAll(result);
+        for (String s : set) {
+            if (s.equals("temp")) continue;
+            ((LinearLayout) findViewById(R.id.root_activity_layout)).addView(getButton(s));
+            refreshFile(s);
+        }
     }
 
     private boolean canResume() {
