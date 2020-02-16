@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.karamchand.criptogramador.main.DefinitionsActivity;
 import com.example.karamchand.criptogramador.main.MainActivity;
 
 public class PhraseActivity extends AppCompatActivity {
@@ -47,6 +48,12 @@ public class PhraseActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(PhraseActivity.this, MainActivity.class));
+            }
+        });
+        findViewById(R.id.button_defs).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(PhraseActivity.this, DefinitionsActivity.class));
             }
         });
         ((TextView) findViewById(R.id.phrase)).addTextChangedListener(getTextWatcher());

@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         findViewById(R.id.finish).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, PrintActivity.class);
+                Intent intent = new Intent(MainActivity.this, DefinitionsActivity.class);
                 intent.putExtra("phrase", mPhrase.getText().toString());
                 intent.putExtra("words", mState);
                 startActivity(intent);

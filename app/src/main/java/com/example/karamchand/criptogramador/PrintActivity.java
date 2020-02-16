@@ -78,6 +78,11 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
             mPunctuation = g.mPunctuation;
             mTitle = g.mFileId;
             mSolution = g.mSolution;
+
+            if (getIntent().hasExtra("definitions_path")) {
+
+            }
+
             findViewById(R.id.save).setVisibility(View.VISIBLE);
             restoreFromState();
         } else {
@@ -217,7 +222,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         for (ArrayList<Integer> wordState : mLettersState) {
             String word = "";
             for (Integer cell : wordState)
-                word += " \t" + Integer.toString(cell) + "\t";
+                word += " \t" + cell + "\t";
             content.add(word);
             content.add("");
         }
