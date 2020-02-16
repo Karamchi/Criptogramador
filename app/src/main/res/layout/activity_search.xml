@@ -54,6 +54,7 @@
             android:layout_weight=".5"
             android:layout_height="wrap_content"
             android:digits="1234567890"
+            android:inputType="number"
             android:textSize="11dp"
             android:maxLines="1"
             android:hint="Let."/>
@@ -64,6 +65,7 @@
             android:layout_weight=".5"
             android:layout_height="wrap_content"
             android:digits="1234567890"
+            android:inputType="number"
             android:textSize="11dp"
             android:maxLines="1"
             android:hint="Cons."/>
@@ -79,6 +81,15 @@
             android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
+
+        <ImageView
+            android:id="@+id/search_lang"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            android:padding="4dp"
+            android:src="@drawable/spain"
+            android:hint="Cons."/>
 
     </FrameLayout>
 

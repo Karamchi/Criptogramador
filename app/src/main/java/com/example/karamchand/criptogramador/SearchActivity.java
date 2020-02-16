@@ -1,14 +1,15 @@
 package com.example.karamchand.criptogramador;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,18 +25,19 @@ public class SearchActivity extends AppCompatActivity {
     public static final int LETTERS = 4;
     public static final int CONSONANTS = 5;
 
-    public ArrayList<String> mCorpus = new ArrayList<>();
+    public ArrayList<String> mCorpus;
     private RecyclerView mRecycler;
     private SearchAdapter adapter;
-    private ArrayList<String> mAlphaCorpus = new ArrayList<>();
+    private ArrayList<String> mAlphaCorpus;
+    private Language language = Language.SPANISH;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        mRecycler = (RecyclerView) findViewById(R.id.recycler);
+        mRecycler = findViewById(R.id.recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        read();
+        read("Dict-es.txt", "DictAlpha-es.txt");
         adapter = new SearchAdapter(mCorpus, mAlphaCorpus);
         mRecycler.setAdapter(adapter);
         ((EditText) findViewById(R.id.search_starts)).addTextChangedListener(getTextWatcher(STARTS));
@@ -44,6 +46,26 @@ public class SearchActivity extends AppCompatActivity {
         ((EditText) findViewById(R.id.search_has_none_of)).addTextChangedListener(getTextWatcher(HAS_NONE));
         ((EditText) findViewById(R.id.search_letters)).addTextChangedListener(getTextWatcher(LETTERS));
         ((EditText) findViewById(R.id.search_consonants)).addTextChangedListener(getTextWatcher(CONSONANTS));
+        setFlag();
+    }
+
+    private void setFlag() {
+        final ImageView flag = findViewById(R.id.search_lang);
+        flag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (language.equals(Language.SPANISH)) {
+                    language = Language.ENGLISH;
+                    flag.setImageDrawable(getDrawable(R.drawable.uk));
+                    read("Dict-en.txt", "DictAlpha-en.txt");
+                } else {
+                    language = Language.SPANISH;
+                    flag.setImageDrawable(getDrawable(R.drawable.spain));
+                    read("Dict-es.txt", "DictAlpha-es.txt");
+                }
+                adapter.changeCorpus(mCorpus, mAlphaCorpus);
+            }
+        });
     }
 
     private TextWatcher getTextWatcher(final int filterType) {
@@ -61,17 +83,19 @@ public class SearchActivity extends AppCompatActivity {
         };
     }
 
-    public void read() {
+    public void read(String corpusFile, String alphaCorpusFile) {
+        mCorpus = new ArrayList<>();
+        mAlphaCorpus = new ArrayList<>();
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("Dict.txt"), "UTF-8"));
+                    new InputStreamReader(getAssets().open(corpusFile), "UTF-8"));
             String mLine;
             while ((mLine = reader.readLine()) != null) {
                 mCorpus.add(mLine);
             }
             reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("DictAlpha.txt"), "UTF-8"));
+                    new InputStreamReader(getAssets().open(alphaCorpusFile), "UTF-8"));
             while ((mLine = reader.readLine()) != null) {
                 mAlphaCorpus.add(mLine);
             }
@@ -88,4 +112,10 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(false);
+    }
+
+    public enum Language {SPANISH, ENGLISH}
 }

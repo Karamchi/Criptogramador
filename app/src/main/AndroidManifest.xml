@@ -15,8 +15,8 @@
         android:theme="@style/AppTheme">
         <activity android:name=".main.MainActivity">
         </activity>
-        <activity android:name=".SearchActivity">
-        </activity>
+        <activity android:name=".SearchActivity"
+            android:taskAffinity="com.some.new" />
         <activity android:name=".PrintActivity">
         </activity>
         <activity android:name=".PhraseActivity">

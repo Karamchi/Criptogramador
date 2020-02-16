@@ -38,11 +38,11 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) mIntent = getIntent();
         setContentView(R.layout.activity_main);
-        mWordsView = ((WordsView) findViewById(R.id.words_view));
+        mWordsView = findViewById(R.id.words_view);
         mWordsView.setOnWordChangedListener(this);
-        mLettersView = (LettersView) findViewById(R.id.letters_view);
+        mLettersView = findViewById(R.id.letters_view);
 
-        mPhrase = (EditText) findViewById(R.id.phrase);
+        mPhrase = findViewById(R.id.phrase);
         mPhrase.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -72,7 +72,9 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
         findViewById(R.id.go_to_search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, SearchActivity.class));
+                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
         findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
@@ -171,8 +173,8 @@ public class MainActivity extends AppCompatActivity implements WordsView.OnWordC
 
     @Override
     public void onWordChanged(int index, String newWord) {
-        mState.set(index, newWord);
         if (mRestoring) return;
+        mState.set(index, newWord);
         Data data = new Data(mState);
         mLettersView.update(data);
         checkIfFinished();

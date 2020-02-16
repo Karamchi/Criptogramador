@@ -1,7 +1,6 @@
 package com.example.karamchand.criptogramador;
 
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,11 +8,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 public class SearchAdapter extends RecyclerView.Adapter {
-    private final ArrayList<String> mCorpus;
-    private final ArrayList<String> mAlphaCorpus;
+    private ArrayList<String> mCorpus;
+    private ArrayList<String> mAlphaCorpus;
     private ArrayList<String> mFilteredCorpus;
     private ArrayList<String> mFilters;
     private ArrayList<Integer> mConsonants = new ArrayList<>();
@@ -26,6 +24,15 @@ public class SearchAdapter extends RecyclerView.Adapter {
         mFilters = new ArrayList<>();
         for (int i = 0; i < 6; i++) mFilters.add("");
         new ConsonantsTask().execute();
+    }
+
+    public void changeCorpus(ArrayList<String> corpus, final ArrayList<String> alphaCorpus) {
+        this.mCorpus = corpus;
+        this.mAlphaCorpus = alphaCorpus;
+        mFilteredCorpus = (ArrayList<String>) this.mCorpus.clone();
+        mFilteredCorpus.add(0, Integer.toString(mFilteredCorpus.size()));
+        new ConsonantsTask().execute();
+        updateFilter();
     }
 
     @Override
@@ -83,7 +90,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
             return false;
         } else {
             if (!(consonants.length() == 0) &&
-                    !(Integer.parseInt(consonants) <= substring.replaceAll("a|e|i|o|u", "").length()))
+                    !(Integer.parseInt(consonants) <= substring.replaceAll("[aeiou]", "").length()))
             return false;
         }
         return true;
@@ -126,7 +133,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
         @Override
         protected Object doInBackground(Object[] objects) {
             for (int i = 0; i < mAlphaCorpus.size(); i++) {
-                mConsonants.add(mAlphaCorpus.get(i).substring(1).replaceAll("a|e|i|o|u", "").length());
+                mConsonants.add(mAlphaCorpus.get(i).substring(1).replaceAll("[aeiou]", "").length());
             }
             return null;
         }
