@@ -28,6 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".main.DefinitionsActivity" />
+        <activity android:name=".PreviewActivity" />
 
     </application>
 

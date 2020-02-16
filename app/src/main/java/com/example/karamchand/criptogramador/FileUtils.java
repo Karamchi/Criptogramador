@@ -19,7 +19,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 
 public class FileUtils {
 
@@ -59,9 +61,19 @@ public class FileUtils {
         requestPermissions(context);
         final File dir = new File(ROOT + path);
         dir.mkdirs();
-        return dir.list();
+        return sort(dir.list());
     }
 
+    private static String[] sort(String[] list) {
+        ArrayList<String> files = new ArrayList<>(Arrays.asList(list));
+        Collections.sort(files);
+
+        return files.toArray(new String[files.size()]);
+    }
+
+    /**
+     * Shows a dialog
+     */
     public static void load(Activity context, final LoadListener listener, final String path) {
         final String[] mFileList = getDirList(context, path);
         if (mFileList == null) return;
@@ -139,5 +151,9 @@ public class FileUtils {
             e.printStackTrace();
         }
         return data;
+    }
+
+    public static String phrase2Filename(String phrase) {
+        return phrase.subSequence(0, Math.min(8, phrase.length())).toString().replace(" ", "_");
     }
 }

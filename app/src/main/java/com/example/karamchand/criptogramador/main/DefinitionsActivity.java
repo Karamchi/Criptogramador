@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -15,7 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.karamchand.criptogramador.FileUtils;
-import com.example.karamchand.criptogramador.PrintActivity;
+import com.example.karamchand.criptogramador.PreviewActivity;
 import com.example.karamchand.criptogramador.R;
 import com.example.karamchand.criptogramador.SearchActivity;
 
@@ -98,11 +98,12 @@ public class DefinitionsActivity extends AppCompatActivity implements FileUtils.
         findViewById(R.id.finish).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(DefinitionsActivity.this, PrintActivity.class);
+                Intent intent = new Intent(DefinitionsActivity.this, PreviewActivity.class);
                 intent.putExtra("words", mWords);
                 intent.putExtra("phrase", phrase);
                 intent.putExtra("definitions_path", save());
-                intent.putExtra("finished_path", finishedpath);
+                if (finishedpath != null)
+                    intent.putExtra("finished_path", finishedpath);
                 //Si no hay archivo finished, dejar que lo genere y recibir de alguna forma el puntero
                 startActivityForResult(intent, 10000);
             }
@@ -119,10 +120,8 @@ public class DefinitionsActivity extends AppCompatActivity implements FileUtils.
         for (int i = 0; i < mWords.size(); i++) {
             content.add(mWords.get(i) + "\t" + mDefinitions.get(i));
         }
-        String filename = FileUtils.saveWithTimeStamp(this,
-                firstLine().subSequence(0, Math.min(8, firstLine().length())).toString().replace(" ", "_"),
-                PATH,
-                content);
+        String filename = FileUtils.phrase2Filename(firstLine());
+        FileUtils.save(this, PATH, filename, content);
         Toast.makeText(this, "File written to " + filename, Toast.LENGTH_SHORT).show();
         return filename;
     }
@@ -149,7 +148,9 @@ public class DefinitionsActivity extends AppCompatActivity implements FileUtils.
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
             word.setLayoutParams(layoutParams);
             word.setText(mWords.get(i));
+            word.setGravity(Gravity.CENTER_VERTICAL);
 
+            layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 4);
             EditText definition = new EditText(this);
             definition.setLayoutParams(layoutParams);
             definition.setText(mDefinitions.get(i));
@@ -162,7 +163,6 @@ public class DefinitionsActivity extends AppCompatActivity implements FileUtils.
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    Log.e("Text", "watcher");
                     mDefinitions.set(int2, editable.toString());
                 }
             });
@@ -178,7 +178,7 @@ public class DefinitionsActivity extends AppCompatActivity implements FileUtils.
     }
 
     private void loadFirstLine(String candidate) {
-        if (candidate.contains("txt")) {
+        if (candidate.length() <= 8) {
             finishedpath = candidate;
         } else {
             finishedpath = null;

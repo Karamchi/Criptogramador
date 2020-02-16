@@ -28,20 +28,19 @@ import static com.example.karamchand.criptogramador.main.LettersView.ALPHABET;
 public class PrintActivity extends AppCompatActivity implements CellView.CellListener,
         SolveWordView.DefinitionShownListener {
 
-    private static final String PATH = "/finished";
     public static final int ROW_WIDTH = 10;
-    private String mTitle;
+    protected String mTitle;
 
     //The numbers that correspond to word i char j
-    private ArrayList<ArrayList<Integer>> mLettersState = new ArrayList<>();
-    private ArrayList<String> mDefinitions = new ArrayList<>();
+    protected ArrayList<ArrayList<Integer>> mLettersState = new ArrayList<>();
+    protected ArrayList<String> mDefinitions = new ArrayList<>();
     //The letter and number corresponding to cell i in the phrase (with spaces)
-    private ArrayList<Character> mCellLetters = new ArrayList<>();
-    private ArrayList<Integer> mCellNumbers = new ArrayList<>();
+    protected ArrayList<Character> mCellLetters = new ArrayList<>();
+    protected ArrayList<Integer> mCellNumbers = new ArrayList<>();
     //For every cell on the phrase, the input
     private HashMap<Integer, Character> mInput = new HashMap<>();
     //For every cell on the phrase with punctuation, the char for its number
-    private HashMap<Integer, Character> mPunctuation = new HashMap<>();
+    protected HashMap<Integer, Character> mPunctuation = new HashMap<>();
 
     //The cell view *on the letters* with this number
     private HashMap<Integer, CellView> mCells;
@@ -52,10 +51,10 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
     private EditText mEditText;
     private CellView mCurrentInput;
     private boolean mFromUser;
-    private int mSolution;
+    protected int mSolution;
     private Timer mTimer = new Timer();
     private int mTime;
-    private Intent mIntent;
+    protected Intent mIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,31 +63,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         setContentView(R.layout.activity_print);
         mLayout = (LinearLayout) findViewById(R.id.activity_print_layout);
         mEditText = ((EditText) findViewById(R.id.print_activity_edit_text));
-        if (mIntent == null) {
-            String[] current = ProfileUtils.getProfile().get("current").split(":");
-            load(FileUtils.readFromFile(RootActivity.PATH, "temp.txt"), current[0]);
-            mTime = Integer.parseInt(current[1]);
-        } else if (mIntent.hasExtra("words")) {
-            Generator g = new Generator(mIntent.getStringExtra("phrase"),
-                    (ArrayList<String>) mIntent.getExtras().get("words"));
-            g.generate();
-            mLettersState = g.mLettersState;
-            mCellLetters = g.mCellLetters;
-            mCellNumbers = g.mCellNumbers;
-            mPunctuation = g.mPunctuation;
-            mTitle = g.mFileId;
-            mSolution = g.mSolution;
-
-            if (getIntent().hasExtra("definitions_path")) {
-
-            }
-
-            findViewById(R.id.save).setVisibility(View.VISIBLE);
-            restoreFromState();
-        } else {
-            load(FileUtils.readFromFile(RootActivity.PATH, mIntent.getStringExtra("filename")),
-                    mIntent.getStringExtra("title"));
-        }
+        generateInitialState();
         setupToolbar();
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -111,13 +86,18 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         });
     }
 
-    private void setupToolbar() {
-        findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                save(true);
-            }
-        });
+    protected void generateInitialState() {
+        if (mIntent == null) {
+            String[] current = ProfileUtils.getProfile().get("current").split(":");
+            load(FileUtils.readFromFile(RootActivity.PATH, "temp.txt"), current[0]);
+            mTime = Integer.parseInt(current[1]);
+        } else {
+            load(FileUtils.readFromFile(RootActivity.PATH, mIntent.getStringExtra("filename")),
+                    mIntent.getStringExtra("title"));
+        }
+    }
+
+    protected void setupToolbar() {
         findViewById(R.id.timer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,7 +118,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         });
     }
 
-    private void restoreFromState() {
+    protected void restoreFromState() {
         findViewById(R.id.show_all).setVisibility(View.VISIBLE);
         findViewById(R.id.timer).setVisibility(View.VISIBLE);
         mLastAdded = null;
@@ -217,7 +197,12 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         mLastRow.addView(new CellView(this).black());
     }
 
-    private void save(boolean showToast) {
+    private void save() {
+        ArrayList<String> content = getSaveContent();
+        FileUtils.save(this, RootActivity.PATH, "temp", content);
+    }
+
+    protected ArrayList<String> getSaveContent() {
         ArrayList<String> content = new ArrayList<>();
         for (ArrayList<Integer> wordState : mLettersState) {
             String word = "";
@@ -234,13 +219,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         }
         content.add(Integer.toString(mSolution));
         content.addAll(mDefinitions);
-
-        if (showToast) {
-            FileUtils.save(this, PATH, mTitle, content);
-            Toast.makeText(this, "File written to " + mTitle, Toast.LENGTH_SHORT).show();
-        } else {
-            FileUtils.save(this, RootActivity.PATH, "temp", content);
-        }
+        return content;
     }
 
     public ArrayList<String> dumpPhrase() {
@@ -285,7 +264,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
         return result;
     }
 
-    private void load(ArrayList<String> contents, String title) {
+    protected void load(ArrayList<String> contents, String title) {
         mTitle = title;
         ((TextView) findViewById(R.id.title)).setText(mTitle);
         mCellLetters = new ArrayList<>();
@@ -317,7 +296,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
             }
         }
         for (; i < contents.size(); i++) {
-            if (contents.get(i).replaceAll("[0-9-]", "").length() > 0)
+            if (contents.get(i).replaceAll("[0-9-]", "").length() > 0 || contents.get(i).isEmpty())
                 mDefinitions.add(contents.get(i));
             else
                 mSolution = Integer.parseInt(contents.get(i));
@@ -410,7 +389,7 @@ public class PrintActivity extends AppCompatActivity implements CellView.CellLis
 
     @Override
     protected void onStop() {
-        save(false);
+        save();
         ProfileUtils.putInProfile(this, "current", mTitle + ":" + Integer.toString(mTime));
         mIntent = null;
         super.onStop();

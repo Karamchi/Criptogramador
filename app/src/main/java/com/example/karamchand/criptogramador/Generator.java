@@ -36,7 +36,7 @@ public class Generator {
         buildIndexes();
         buildWords();
         buildPhrase();
-        mFileId =  mPhrase.subSequence(0, Math.min(8, mPhrase.length())).toString().replace(" ", "_");
+        mFileId = FileUtils.phrase2Filename(mPhrase);
         mSolution = mPhraseAlpha.hashCode();
     }
 
