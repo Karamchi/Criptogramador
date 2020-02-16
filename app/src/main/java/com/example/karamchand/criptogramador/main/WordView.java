@@ -63,6 +63,14 @@ public class WordView extends LinearLayout {
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if (oldText != null) {
+            mEditText.setText(oldText);
+        }
+    }
+
+    @Override
     public void setOnFocusChangeListener(final OnFocusChangeListener l) {
         mEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
@@ -84,6 +92,7 @@ public class WordView extends LinearLayout {
     }
 
     public void setText(String s) {
-        mEditText.setText(s);
+        if (!isAttachedToWindow()) oldText = s;
+        else mEditText.setText(s);
     }
 }
